@@ -1,0 +1,6 @@
+# Treat the rendered website + big data files as binary for diff purposes.
+index.html         binary
+index_template.html binary
+*.csv              binary
+*.zip              binary
+*.png              binary

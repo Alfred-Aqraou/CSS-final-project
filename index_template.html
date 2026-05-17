@@ -338,6 +338,43 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 .pc-card .pc-terms{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px 6px}
 .pc-card .pc-term{font-family:'Space Mono',monospace;font-size:11.5px;background:#1c1c22;
   color:#f4f1ea;padding:3px 7px;border-radius:3px;border:1px solid #26262c}
+.pc-card .pc-sig{margin-top:10px;font-family:'Space Mono',monospace}
+.pc-card .pc-sig-h{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#6a675f;margin-bottom:4px}
+.pc-card .pc-sig-list{margin:0;padding-left:18px;color:#f4f1ea;font-size:12px;line-height:1.55}
+.pc-card .pc-sig-list b{color:#46d6e0;font-weight:500}
+.pc-card .pc-year{color:#6a675f;font-size:10.5px}
+
+/* Option D — sentiment by cluster strip */
+.cs-block{margin-top:32px}
+.cs-grid{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.cs-row{display:grid;grid-template-columns:230px 1fr 100px;align-items:center;gap:18px;
+  padding:12px 14px;background:#16161a;border:1px solid #26262c;border-radius:8px}
+.cs-label .cs-name{font-family:'Fraunces',serif;font-size:13.5px;color:#f4f1ea;line-height:1.3;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cs-label .cs-meta{font-family:'Space Mono',monospace;font-size:10px;color:#6a675f;
+  margin-top:2px;letter-spacing:.04em;text-transform:uppercase}
+.cs-bars{display:flex;flex-direction:column;gap:5px;font-family:'Space Mono',monospace}
+.cs-bar{display:grid;grid-template-columns:70px 200px 60px;align-items:center;gap:10px;font-size:11px}
+.cs-bar .cs-key{color:#9a978f;font-size:10.5px}
+.cs-bar .cs-key.aud{color:#f4b740}
+.cs-bar .cs-key.cri{color:#46d6e0}
+.cs-bar .cs-track{display:block;height:8px;background:#0e0e11;border-radius:4px;position:relative}
+.cs-bar .cs-fill{display:block;height:100%;border-radius:4px;background:#9a978f}
+.cs-bar .cs-fill.aud{background:#f4b740}
+.cs-bar .cs-fill.cri{background:#46d6e0}
+.cs-bar .cs-val{font-family:'Space Mono',monospace;font-size:11.5px;color:#f4f1ea;text-align:right}
+.cs-pct{text-align:right;font-family:'Space Mono',monospace}
+.cs-pct .cs-pct-v{font-size:18px;color:#f4f1ea;font-weight:500}
+.cs-pct .cs-pct-k{font-size:9.5px;color:#6a675f;letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+
+/* Centrality "who matters" table */
+.cent-block{margin-top:18px;padding:18px 20px;background:#16161a;border:1px solid #26262c;border-radius:8px}
+.cent-block h4{margin:0 0 4px;font-family:'Fraunces',serif;font-size:16px;color:#f4f1ea;font-weight:500}
+.cent-block .cs{color:#9a978f;font-size:11.5px;font-family:'Space Mono',monospace;margin-bottom:14px;line-height:1.55}
+.cent-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:0;font-family:'Space Mono',monospace;font-size:12px}
+.cent-grid .h{color:#6a675f;font-size:10px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid #26262c;padding:6px 8px}
+.cent-grid .v{padding:6px 8px;border-bottom:1px solid #1c1c22;color:#f4f1ea}
+.cent-grid .rk{color:#6a675f;width:18px;display:inline-block}
 
 /* Dataset intro block (Intro tab) */
 .ds-wrap{max-width:1400px;margin:0 auto;padding:0 32px}
@@ -541,8 +578,16 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <label>
         Node size
         <select id="node-size-mode">
-          <option value="value_abs">Absolute adjusted profit ($2026)</option>
-          <option value="value_per_year">Per-year percentile (avg per film)</option>
+          <optgroup label="Success metric">
+            <option value="value_abs">Absolute adjusted profit ($2026)</option>
+            <option value="value_per_year">Per-year percentile (avg per film)</option>
+          </optgroup>
+          <optgroup label="Centrality (week 6)">
+            <option value="degree">Degree — # of collaborators</option>
+            <option value="centrality_betweenness">Betweenness — bridges between clusters</option>
+            <option value="centrality_eigenvector">Eigenvector — dense core</option>
+            <option value="centrality_pagerank">PageRank — damped eigenvector</option>
+          </optgroup>
         </select>
       </label>
       <label>
@@ -634,6 +679,12 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="null-read" id="null-attr-read"></div>
   </div>
 
+  <div class="cent-block reveal">
+    <h4>Who matters by which definition? (week 6 centrality)</h4>
+    <div class="cs">Network science offers several definitions of "important", each picking up a different shape of influence. <b>Degree</b> = most collaborators; <b>Betweenness</b> = bridges between clusters; <b>Eigenvector</b> = members of the densest core; <b>PageRank</b> = damped eigenvector. Toggle the node-size dropdown above to see the graph re-sized by each. Top 5 under each measure:</div>
+    <div class="cent-grid" id="cent-grid"></div>
+  </div>
+
   <div class="ntable reveal">
     <table><thead><tr>
       <th class="rk">#</th><th onclick="sortNet('person')">Person</th>
@@ -697,9 +748,18 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">04b · Communities × Language</div>
   <h2>What each <em>cluster</em> is about</h2>
-  <p class="body-lg">The collaboration network groups people who repeatedly work together. Do those clusters also share a <b>plot vocabulary</b>? For each of the five largest communities, TF-IDF on plot summaries — that cluster's films versus every other film — surfaces the words most distinctive of it. IDF is computed across the full 3,781-film corpus (not within communities) so generic words don't dominate; <code>ngram_range=(1, 2)</code> includes bigrams so collocations like <em>final battle</em> can surface. Methodology in §3.5–3.7 of the explainer notebook.</p></div>
+  <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster three ways at once: its three most prolific people, its three highest-grossing <b>signature films</b>, and its most distinctive plot vocabulary. IDF is computed across the full 3,781-film corpus (not within communities) so generic words don't dominate; chi-squared collocations from notebook §3.6.5 are merged into single tokens so multi-word phrases can surface (e.g. <em>tony_stark</em>). Methodology in §3.5–3.7 of the explainer notebook.</p></div>
   <div class="pc-block reveal">
     <div class="pc-grid" id="pc-grid"></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="reveal"><div class="tag">04c · Sentiment by cluster</div>
+  <h2>Which clusters are <em>loved</em> &mdash; and which just <em>succeed</em>?</h2>
+  <p class="body-lg">For each of the same five clusters: mean <b>audience</b> sentiment (TMDb reviews · amber) vs mean <b>critic</b> sentiment (Wikipedia · cyan), with median per-year percentile on the right. A wide cyan bar with a narrow amber bar means critics champion films audiences don't reach for; the opposite reveals audience-driven hits.</p></div>
+  <div class="cs-block reveal">
+    <div class="cs-grid" id="pc-sentiment-grid"></div>
   </div>
 </div></section>
 
@@ -971,6 +1031,7 @@ function render(){
   renderReviewsCriticsCompare();
   renderSentiment();
   renderNullComparison();
+  renderCentralityTable();
   renderPerCommunity();
   // re-trigger bar fills
   setTimeout(fillBars,50);
@@ -995,8 +1056,10 @@ function renderNullComparison(){
     return;
   }
   const pm = (m, s) => `${(+m).toFixed(3)}<span class="pm">&plusmn; ${(+s).toFixed(3)}</span>`;
-  // Strip 1 — topology
+  // Strip 1 — topology: TWO modularity rows (observed-partition + native detection)
   const t = d.topology || {};
+  const cfg_native = t.config_modularity_native || {mean: 0, std: 0};
+  const er_native  = t.er_modularity_native     || {mean: 0, std: 0};
   grid.innerHTML = `
     <div class="h"></div>
     <div class="h">Modularity</div>
@@ -1004,17 +1067,17 @@ function renderNullComparison(){
     <div class="v label">Observed network</div>
     <div class="v observed">${(+t.observed_modularity).toFixed(3)}</div>
     <div class="v observed">${(+t.observed_clustering).toFixed(3)}</div>
-    <div class="v label">Configuration null<span class="pm">degree-preserving · ${d.realizations || 100}&times;</span></div>
-    <div class="v">${pm(t.config_modularity.mean, t.config_modularity.std)}</div>
+    <div class="v label">Configuration null<span class="pm">degree-preserving &middot; ${d.realizations || 100}&times;<br>using <em>our</em> partition / <em>native</em> detection</span></div>
+    <div class="v">${pm(t.config_modularity.mean, t.config_modularity.std)}<br><span class="pm" style="margin-left:0">native ${pm(cfg_native.mean, cfg_native.std)}</span></div>
     <div class="v">${pm(t.config_clustering.mean, t.config_clustering.std)}</div>
-    <div class="v label">Erd&#337;s&ndash;R&eacute;nyi null<span class="pm">totals only · ${d.realizations || 100}&times;</span></div>
-    <div class="v">${pm(t.er_modularity.mean, t.er_modularity.std)}</div>
+    <div class="v label">Erd&#337;s&ndash;R&eacute;nyi null<span class="pm">totals only &middot; ${d.realizations || 100}&times;</span></div>
+    <div class="v">${pm(t.er_modularity.mean, t.er_modularity.std)}<br><span class="pm" style="margin-left:0">native ${pm(er_native.mean, er_native.std)}</span></div>
     <div class="v">${pm(t.er_clustering.mean, t.er_clustering.std)}</div>
   `;
   if(read){
-    const dCfg = (+t.observed_modularity) - (+t.config_modularity.mean);
-    const dEr  = (+t.observed_modularity) - (+t.er_modularity.mean);
-    read.innerHTML = `<b>Read it:</b> observed modularity ${(+t.observed_modularity).toFixed(2)} sits ${dCfg.toFixed(2)} above the degree-preserving null and ${dEr.toFixed(2)} above ER, and observed clustering is two orders of magnitude higher. The collaboration clusters are not an artefact of degree distribution &mdash; people really do work inside repeating circles, independently of how we define success.`;
+    const dPart = (+t.observed_modularity) - (+t.config_modularity.mean);
+    const dNat  = (+t.observed_modularity) - (+cfg_native.mean);
+    read.innerHTML = `<b>Read it (two tests in one).</b> Under our <em>observed partition</em>, random rewiring drops modularity to ~0 (a ${dPart.toFixed(2)}-point gap) &mdash; rigorous statistical proof that the communities we found are real. Under <em>native detection</em> (running greedy modularity on the random graph itself, the framing from the week-6 exercises), the null still finds modularity ~${(+cfg_native.mean).toFixed(2)} thanks to the resolution-limit artefact, and our observed 0.71 is ${dNat.toFixed(2)} above it &mdash; still a real signal, calibrated against the standard baseline.`;
   }
   // Strip 2 — track-aware attribute assortativity
   if(aGrid && d.attribute_assortativity){
@@ -1042,9 +1105,33 @@ function renderNullComparison(){
   }
 }
 
+function renderCentralityTable(){
+  const grid = document.getElementById('cent-grid');
+  if(!grid) return;
+  const top = (D && D.network && D.network.centrality_top5) || null;
+  if(!top){
+    grid.innerHTML = '<div class="v label" style="grid-column:1/-1">Run the notebook to populate centrality.</div>';
+    return;
+  }
+  const cols = [
+    {key: 'degree',      label: 'Degree'},
+    {key: 'betweenness', label: 'Betweenness'},
+    {key: 'eigenvector', label: 'Eigenvector'},
+    {key: 'pagerank',    label: 'PageRank'},
+  ];
+  let html = cols.map(c => `<div class="h">${c.label}</div>`).join('');
+  for(let i = 0; i < 5; i++){
+    html += cols.map(c => {
+      const row = (top[c.key] || [])[i];
+      return `<div class="v"><span class="rk">${i+1}.</span>${row ? row.person : '&mdash;'}</div>`;
+    }).join('');
+  }
+  grid.innerHTML = html;
+}
+
 function renderPerCommunity(){
-  // Strip on the Text tab: top-N collaboration communities, each card lists
-  // the plot-text terms most distinctive of that community vs every other.
+  // Card per cluster: top-3 signature films + most distinctive plot terms
+  // (bigram-filtered where possible).  Option C from the design discussion.
   const grid = document.getElementById('pc-grid');
   if(!grid) return;
   const data = (D && D.per_community_tfidf) || [];
@@ -1052,13 +1139,61 @@ function renderPerCommunity(){
     grid.innerHTML = '<div class="pc-card"><div class="pc-label">Run the notebook to populate per-community TF-IDF.</div></div>';
     return;
   }
-  grid.innerHTML = data.map(c => `
+  grid.innerHTML = data.map(c => {
+    const sig = (c.signature_films || []).map(f =>
+      `<li><b>${f.title}</b><span class="pc-year"> (${f.year})</span></li>`).join('');
+    return `
     <div class="pc-card">
       <div class="pc-label">${c.label || ('Community ' + c.community_id)}</div>
       <div class="pc-meta">${c.n_films} films &middot; cluster ${c.community_id}</div>
+      ${sig ? `<div class="pc-sig"><div class="pc-sig-h">Signature films</div><ol class="pc-sig-list">${sig}</ol></div>` : ''}
       <div class="pc-terms">${(c.terms||[]).map(t => `<span class="pc-term">${t.term}</span>`).join('')}</div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+  renderClusterSentiment();
+}
+
+function renderClusterSentiment(){
+  // Option D — a separate strip below the per-community panel showing
+  // audience vs critic sentiment for each cluster, plus median per-year
+  // percentile so the reader can see "loved vs successful" at a glance.
+  const host = document.getElementById('pc-sentiment-grid');
+  if(!host) return;
+  const data = (D && D.per_community_tfidf) || [];
+  if(!data.length){ host.innerHTML = ''; return; }
+  const sentMin = -1, sentMax = 1;
+  const barPx = v => Math.max(2, Math.round(((v - sentMin) / (sentMax - sentMin)) * 180));
+  host.innerHTML = data.map(c => {
+    const s = c.sentiment || {};
+    const a = s.audience_compound, k = s.critic_compound;
+    const pa = a != null ? barPx(a) : 0, pk = k != null ? barPx(k) : 0;
+    const ax = a != null ? (a >= 0 ? '+' : '') + a.toFixed(2) : '—';
+    const kx = k != null ? (k >= 0 ? '+' : '') + k.toFixed(2) : '—';
+    const pct = s.median_pct_year != null ? s.median_pct_year.toFixed(0) : '—';
+    return `
+    <div class="cs-row">
+      <div class="cs-label">
+        <div class="cs-name">${c.label || ('Community ' + c.community_id)}</div>
+        <div class="cs-meta">${c.n_films} films · cluster ${c.community_id}</div>
+      </div>
+      <div class="cs-bars">
+        <div class="cs-bar">
+          <span class="cs-key aud">audience</span>
+          <span class="cs-track"><i class="cs-fill aud" style="width:${pa}px"></i></span>
+          <span class="cs-val">${ax}</span>
+        </div>
+        <div class="cs-bar">
+          <span class="cs-key cri">critic</span>
+          <span class="cs-track"><i class="cs-fill cri" style="width:${pk}px"></i></span>
+          <span class="cs-val">${kx}</span>
+        </div>
+      </div>
+      <div class="cs-pct">
+        <div class="cs-pct-v">${pct}</div>
+        <div class="cs-pct-k">median per-year %ile</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function wireNotebookLinks(){
@@ -1907,7 +2042,15 @@ function drawInteractiveNetwork(){
 
   // Meta caption
   const meta = net.meta || {};
-  const modeName = mode === 'value_abs' ? 'absolute adjusted profit' : 'per-year percentile (average per film)';
+  const MODE_LABELS = {
+    'value_abs':              'absolute adjusted profit',
+    'value_per_year':         'per-year percentile (average per film)',
+    'degree':                 'degree centrality (# collaborators)',
+    'centrality_betweenness': 'betweenness centrality (bridges between clusters)',
+    'centrality_eigenvector': 'eigenvector centrality (dense core)',
+    'centrality_pagerank':    'PageRank (damped eigenvector)',
+  };
+  const modeName = MODE_LABELS[mode] || mode;
   const commLabel = (commFilter !== '' && commSel && commSel.selectedOptions[0])
     ? commSel.selectedOptions[0].textContent : null;
   document.getElementById('network-meta').innerHTML =
@@ -1996,7 +2139,7 @@ const TAB_HOOKS = {
   // Called every time a tab activates. Charts re-run so they fit the now-visible viewport.
   methodology: () => { try{ drawTF(); }catch(e){} },
   attributes:  () => { try{ fillBars(); }catch(e){} },
-  network:     () => { try{ drawInteractiveNetwork(); renderNullComparison(); }catch(e){} },
+  network:     () => { try{ drawInteractiveNetwork(); renderNullComparison(); renderCentralityTable(); }catch(e){} },
   text:        () => { try{ renderPerCommunity(); }catch(e){} },
   discussion:  () => { try{ fillBars(); }catch(e){} },
   notebook:    () => { try{ wireNotebookLinks(); }catch(e){} },

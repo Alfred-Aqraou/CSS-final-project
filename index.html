@@ -704,9 +704,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <div class="tab-pane" data-tab="text">
 <section><div class="wrap">
   <div class="reveal">
-    <div class="tag">04 · Audience vs Critics</div>
+    <div class="tag">Audience vs Critics</div>
     <h2>How <em>audiences</em> diverge from <em>critics</em></h2>
-    <p class="body-lg">Two takes on the same films: <b>audience reviews</b> (TMDb, live TF-IDF on the active track, plus VADER sentiment) vs <b>critical reception</b> (Wikipedia, live TF-IDF on the active track, plus VADER sentiment). Where both sides land on the same term, it carries an overlap badge — those are the words the recipe should care about most.</p>
+    <p class="body-lg">Two takes on the same films: <b>audience reviews</b> (TMDb, TF-IDF on the active track, plus VADER sentiment) vs <b>critical reception</b> (Wikipedia, TF-IDF on the active track, plus VADER sentiment). Where both sides land on the same term, it carries an overlap badge — those are the words the recipe should care about most.</p>
     <span class="tbadge a aonly inl"><span class="dot"></span>Track A · adjusted profit</span>
     <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year</span>
   </div>
@@ -722,11 +722,11 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <h4>What success sounds like — top 10% by current track</h4>
     <div class="rc-row-pair">
       <div class="rc-card audience">
-        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · live TF-IDF</span></div>
+        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · TF-IDF</span></div>
         <div id="rc-aud-hi" class="rc-terms"></div>
       </div>
       <div class="rc-card critic">
-        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · live TF-IDF</span></div>
+        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · TF-IDF</span></div>
         <div id="rc-cri-hi" class="rc-terms"></div>
       </div>
     </div>
@@ -734,11 +734,11 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <h4 style="margin-top:32px">What failure sounds like — bottom 10% by current track</h4>
     <div class="rc-row-pair">
       <div class="rc-card audience">
-        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · live TF-IDF</span></div>
+        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · TF-IDF</span></div>
         <div id="rc-aud-lo" class="rc-terms"></div>
       </div>
       <div class="rc-card critic">
-        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · live TF-IDF</span></div>
+        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · TF-IDF</span></div>
         <div id="rc-cri-lo" class="rc-terms"></div>
       </div>
     </div>
@@ -746,7 +746,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div></section>
 
 <section><div class="wrap">
-  <div class="reveal"><div class="tag">04b · Communities × Language</div>
+  <div class="reveal"><div class="tag">Communities × Language</div>
   <h2>What each <em>cluster</em> is about</h2>
   <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster three ways at once: its three most prolific people, its three highest-grossing <b>signature films</b>, and its most distinctive plot vocabulary. IDF is computed across the full 3,781-film corpus (not within communities) so generic words don't dominate; chi-squared collocations from notebook §3.6.5 are merged into single tokens so multi-word phrases can surface (e.g. <em>tony_stark</em>). Methodology in §3.5–3.7 of the explainer notebook.</p></div>
   <div class="pc-block reveal">
@@ -755,7 +755,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div></section>
 
 <section><div class="wrap">
-  <div class="reveal"><div class="tag">04c · Sentiment by cluster</div>
+  <div class="reveal"><div class="tag">Sentiment by cluster</div>
   <h2>Which clusters are <em>loved</em> &mdash; and which just <em>succeed</em>?</h2>
   <p class="body-lg">For each of the same five clusters: mean <b>audience</b> sentiment (TMDb reviews · amber) vs mean <b>critic</b> sentiment (Wikipedia · cyan), with median per-year percentile on the right. A wide cyan bar with a narrow amber bar means critics champion films audiences don't reach for; the opposite reveals audience-driven hits.</p></div>
   <div class="cs-block reveal">
@@ -764,7 +764,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div></section>
 
 <section><div class="wrap">
-  <div class="reveal"><div class="tag">03 · Plot Themes</div>
+  <div class="reveal"><div class="tag">Plot Themes</div>
   <h2>Scale vs <em>life</em></h2>
   <p class="body-lg">Wikipedia plot summaries, TF-IDF by the active track. The cleaning step strips wiki / HTML markup but does <em>not</em> remove proper nouns &mdash; so character names like <em>ethan</em>, <em>peter</em> and <em>jack</em> appear in the high-success column because Mission Impossible, Spider-Man and Reacher franchises do. A higher-level "named-entity strip" is listed in the notebook's §4 as a worthwhile follow-up.</p></div>
   <div class="wc-block reveal"><div class="wc-grid">

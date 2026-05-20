@@ -371,7 +371,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 .cent-block{margin-top:18px;padding:18px 20px;background:#16161a;border:1px solid #26262c;border-radius:8px}
 .cent-block h4{margin:0 0 4px;font-family:'Fraunces',serif;font-size:16px;color:#f4f1ea;font-weight:500}
 .cent-block .cs{color:#9a978f;font-size:11.5px;font-family:'Space Mono',monospace;margin-bottom:14px;line-height:1.55}
-.cent-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:0;font-family:'Space Mono',monospace;font-size:12px}
+.cent-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:0;font-family:'Space Mono',monospace;font-size:12px}
 .cent-grid .h{color:#6a675f;font-size:10px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid #26262c;padding:6px 8px}
 .cent-grid .v{padding:6px 8px;border-bottom:1px solid #1c1c22;color:#f4f1ea}
 .cent-grid .rk{color:#6a675f;width:18px;display:inline-block}
@@ -585,8 +585,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
           <optgroup label="Centrality (week 6)">
             <option value="degree">Degree — # of collaborators</option>
             <option value="centrality_betweenness">Betweenness — bridges between clusters</option>
+            <option value="centrality_closeness">Closeness — reach across the graph</option>
             <option value="centrality_eigenvector">Eigenvector — dense core</option>
-            <option value="centrality_pagerank">PageRank — damped eigenvector</option>
           </optgroup>
         </select>
       </label>
@@ -681,7 +681,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 
   <div class="cent-block reveal">
     <h4>Who matters by which definition? (week 6 centrality)</h4>
-    <div class="cs">Network science offers several definitions of "important", each picking up a different shape of influence. <b>Degree</b> = most collaborators; <b>Betweenness</b> = bridges between clusters; <b>Eigenvector</b> = members of the densest core; <b>PageRank</b> = damped eigenvector. Toggle the node-size dropdown above to see the graph re-sized by each. Top 5 under each measure:</div>
+    <div class="cs">Network science offers three centrality definitions, each picking up a different shape of influence. <b>Betweenness</b> = bridges between clusters; <b>Closeness</b> = how quickly a person can reach everyone else; <b>Eigenvector</b> = members of the densest core. Toggle the node-size dropdown above to see the graph re-sized by each. Top 5 under each measure:</div>
     <div class="cent-grid" id="cent-grid"></div>
   </div>
 
@@ -1016,12 +1016,8 @@ function render(){
   }
   document.getElementById('budgettrio').innerHTML=trio.map(c=>
     `<div class="card ${c[0]}"><div class="bar"></div><h3>${c[1]}</h3><div class="lab">${c[2]}</div><div class="big">${c[3]}</div><div class="rl">${c[4]}</div><p>${c[5]}</p></div>`).join('');
-  // network: track toggle now nudges the network's node-size mode
-  // (the explicit selector below still wins if the user touches it).
   const sizeSel = document.getElementById('node-size-mode');
-  if(sizeSel && !sizeSel.dataset.userTouched){
-    sizeSel.value = A ? 'value_abs' : 'value_per_year';
-  }
+  if(sizeSel) sizeSel.value = A ? 'value_abs' : 'value_per_year';
   drawInteractiveNetwork();
   // word clouds
   const tk=A?'A_whole_period':'B_per_year';
@@ -1114,10 +1110,9 @@ function renderCentralityTable(){
     return;
   }
   const cols = [
-    {key: 'degree',      label: 'Degree'},
     {key: 'betweenness', label: 'Betweenness'},
+    {key: 'closeness',   label: 'Closeness'},
     {key: 'eigenvector', label: 'Eigenvector'},
-    {key: 'pagerank',    label: 'PageRank'},
   ];
   let html = cols.map(c => `<div class="h">${c.label}</div>`).join('');
   for(let i = 0; i < 5; i++){
@@ -1496,7 +1491,7 @@ const NET = {
   cssW: 0, cssH: 0,
   VW: 1200, VH: 750,          // virtual coordinate space
   fit: { k: 1, x: 0, y: 0 },  // letterbox transform: virtual → canvas pixels
-  transform: { k: 1, x: 0, y: 0 }, // user pan/zoom (applied AFTER fit)
+  transform: { k: 0.85, x: 90, y: 56 }, // user pan/zoom (applied AFTER fit)
   nodes: [], edges: [], labels: [],
   quadtree: null, hover: null, drag: null, pan: null,
   mode: 'value_abs', r: null,
@@ -1612,7 +1607,7 @@ function _netSearch(q){
   });
 }
 function _netResetView(){
-  NET.transform = { k: 1, x: 0, y: 0 };
+  NET.transform = { k: 0.85, x: 90, y: 56 };
   _paintNetwork();
 }
 function _virtFromClient(clientX, clientY){
@@ -1932,7 +1927,7 @@ function drawInteractiveNetwork(){
   const nr = _readSlider('node-relative', 1);
   _writeLabel('node-scale-val',    ns.toFixed(1) + '×');
   _writeLabel('node-relative-val', nr.toFixed(1) + '×');
-  const exponent = 0.5 * nr;                          // 1.0 → 0.5 (sqrt, default)
+  const exponent = mode === 'value_per_year' ? 1.0 * nr : 0.5 * nr;  // per-year: stronger contrast between large/small
   const yrAll = (D.network && D.network.years) || [];
   const yMinEl = document.getElementById('yr-min');
   const yMaxEl = document.getElementById('yr-max');
@@ -1969,7 +1964,9 @@ function drawInteractiveNetwork(){
   // ── D3-force layout (collision radius = actual node size) ────────────
   // Positions cached by (commFilter, minW) — slider tweaks run only the
   // short relaxation in updateNodeScale, not this full simulation.
-  const _posKey = commFilter + '|' + minW;
+  // Cache key includes mode so per-year and abs layouts are stored separately
+  // (per-year uses lower gravity, producing a different equilibrium).
+  const _posKey = commFilter + '|' + minW + '|' + mode;
   if(NET._posCache && NET._posCache.key === _posKey && NET._posCache.map.size === nodes.length){
     const cached = NET._posCache.map;
     nodes.forEach(n => { const p = cached.get(n.id); if(p){ n.px = p[0]; n.py = p[1]; } });
@@ -1990,11 +1987,13 @@ function drawInteractiveNetwork(){
     const pad = 80;
     nodes.forEach(n => { n.x = pad + _rnd() * (NET.VW - 2*pad); n.y = pad + _rnd() * (NET.VH - 2*pad); });
     const ticks = nodes.length > 1500 ? 200 : nodes.length > 500 ? 300 : 400;
+    const gravity = mode === 'value_per_year' ? 0.06 : 0.1;
+    const charge = mode === 'value_per_year' ? -55 : -30;
     const sim = d3.forceSimulation(nodes)
-      .force('charge', d3.forceManyBody().strength(-30))
+      .force('charge', d3.forceManyBody().strength(charge))
       .force('link', d3.forceLink(simEdges).id(d => d.id).distance(5).strength(0.4))
-      .force('x', d3.forceX(cx).strength(0.1))
-      .force('y', d3.forceY(cy).strength(0.1))
+      .force('x', d3.forceX(cx).strength(gravity))
+      .force('y', d3.forceY(cy).strength(gravity))
       .force('collide', d3.forceCollide().radius(d => d.pr + 2).strength(1.0))
       .stop();
     for(let i = 0; i < ticks; i++) sim.tick();
@@ -2038,8 +2037,8 @@ function drawInteractiveNetwork(){
     'value_per_year':         'per-year percentile (average per film)',
     'degree':                 'degree centrality (# collaborators)',
     'centrality_betweenness': 'betweenness centrality (bridges between clusters)',
+    'centrality_closeness':   'closeness centrality (reach across the graph)',
     'centrality_eigenvector': 'eigenvector centrality (dense core)',
-    'centrality_pagerank':    'PageRank (damped eigenvector)',
   };
   const modeName = MODE_LABELS[mode] || mode;
   const commLabel = (commFilter !== '' && commSel && commSel.selectedOptions[0])

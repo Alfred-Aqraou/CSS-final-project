@@ -1,7 +1,7 @@
 # Handover · Recipe for High-Grossing Movies
 
 DTU course 02467 Computational Social Science · Spring 2026 · Project Assignment B.
-Website: [<https://github.com/Vaksth/comsocsci2026_final_project>](https://alfred-aqraou.github.io/CSS-final-project/).
+Website: https://alfred-aqraou.github.io/CSS-final-project/
 
 This file is the entry point for a new collaborator (or a fresh Claude session) picking up the project cold. Read this first, then open `Analysis-3.ipynb`.
 

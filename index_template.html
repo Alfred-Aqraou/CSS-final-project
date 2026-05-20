@@ -484,7 +484,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <div class="ds-stat"><div class="ds-k">Years</div><div class="ds-v" id="ds-years">2000–2026</div><div class="ds-sub">27 years · 2026 partial (extraction date May)</div></div>
       <div class="ds-stat"><div class="ds-k">Network nodes</div><div class="ds-v" id="ds-nodes">2,520</div><div class="ds-sub">cast + directors · edge weight ≥ 2</div></div>
       <div class="ds-stat"><div class="ds-k">Network edges</div><div class="ds-v" id="ds-edges">7,203</div><div class="ds-sub">weighted by shared films</div></div>
-      <div class="ds-stat"><div class="ds-k">Communities</div><div class="ds-v" id="ds-comms">—</div><div class="ds-sub">greedy modularity</div></div>
+      <div class="ds-stat"><div class="ds-k">Communities</div><div class="ds-v" id="ds-comms">—</div><div class="ds-sub">Louvain</div></div>
       <div class="ds-stat"><div class="ds-k">Wiki plot text</div><div class="ds-v">2,865</div><div class="ds-sub">76 % coverage</div></div>
       <div class="ds-stat"><div class="ds-k">Wiki critic text</div><div class="ds-v">2,901</div><div class="ds-sub">77 % coverage</div></div>
       <div class="ds-stat"><div class="ds-k">Modularity</div><div class="ds-v" id="ds-mod">—</div><div class="ds-sub">vs. ~0.40 in random null</div></div>
@@ -600,9 +600,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <label>
         Show labels
         <select id="node-label-mode">
+          <option value="0" selected>None</option>
           <option value="25">Top 25 by node value</option>
           <option value="50">Top 50 by node value</option>
-          <option value="0">None</option>
         </select>
       </label>
       <label>
@@ -624,32 +624,32 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
         <input id="net-search" type="text" placeholder="e.g. Tom Cruise" autocomplete="off" spellcheck="false">
         <div id="net-search-results"></div>
       </label>
-      <label title="Drag to scale every node up or down together. 1.0× = default visual.">
+      <label title="Drag to scale every node up or down together. 1.0× = default visual." style="display:none">
         Node size
         <div class="rrow">
           <input id="node-scale" type="range" min="0.1" max="10.0" value="1.0" step="0.05" style="width:130px">
           <span id="node-scale-val">1.0×</span>
         </div>
       </label>
-      <label title="Compress or stretch the gap between biggest and smallest nodes. 1.0× = sqrt scaling (default).">
+      <label title="Compress or stretch the gap between biggest and smallest nodes. 1.0× = sqrt scaling (default)." style="display:none">
         Node relative size
         <div class="rrow">
-          <input id="node-relative" type="range" min="0.1" max="6.0" value="1.0" step="0.05" style="width:130px">
+          <input id="node-relative" type="range" min="0.1" max="6.0" value="1.5" step="0.05" style="width:130px">
           <span id="node-relative-val">1.0×</span>
         </div>
       </label>
-      <label title="Overall edge visibility — higher = darker, thicker lines.">
+      <label title="Overall edge visibility — higher = darker, thicker lines." style="display:none">
         Edge strength
         <div class="rrow">
-          <input id="edge-strength" type="range" min="0.3" max="2.5" value="1.0" step="0.05" style="width:130px">
-          <span id="edge-strength-val">1.0×</span>
+          <input id="edge-strength" type="range" min="0.3" max="2.5" value="2.0" step="0.05" style="width:130px">
+          <span id="edge-strength-val">2.0×</span>
         </div>
       </label>
-      <label title="How much the visual difference between weak and strong collaborations is emphasised. 1.0× = sqrt scaling.">
+      <label title="How much the visual difference between weak and strong collaborations is emphasised. 1.0× = sqrt scaling." style="display:none">
         Edge relative strength
         <div class="rrow">
-          <input id="edge-relative" type="range" min="0.5" max="2.5" value="1.0" step="0.05" style="width:130px">
-          <span id="edge-relative-val">1.0×</span>
+          <input id="edge-relative" type="range" min="0.5" max="2.5" value="1.5" step="0.05" style="width:130px">
+          <span id="edge-relative-val">1.5×</span>
         </div>
       </label>
     </div>
@@ -818,7 +818,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <h4>What went well</h4>
       <ul>
         <li><b>Two-track methodology pays off</b> &mdash; rankings shift visibly between Track A and Track B, validating the inflation-fairness argument.</li>
-        <li><b>The network has real structure</b> &mdash; observed modularity 0.71 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
+        <li><b>The network has real structure</b> &mdash; observed modularity 0.73 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
         <li><b>Successful people cluster</b> &mdash; Newman attribute assortativity sharply positive and far outside the label-shuffle null under both tracks.</li>
         <li><b>Per-community vocabulary is interpretable</b> &mdash; corpus-wide IDF + bigrams surface coherent cluster vocabularies (MCU, Fast &amp; Furious, X-Men/LOTR), the network &times; text integration the rubric asks for.</li>
       </ul>
@@ -855,9 +855,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap nb-landing">
   <div class="kicker reveal">For the curious</div>
   <h2>The explainer <em>notebook</em></h2>
-  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis-3.ipynb</code>, which is structured per the four sections required by Project Assignment B &mdash; Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
+  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis.ipynb</code>, which is structured per the four sections required by Project Assignment B &mdash; Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
 
-  <a class="nb-big-btn reveal" id="nb-open" href="Analysis-3.ipynb" target="_blank" rel="noopener">
+  <a class="nb-big-btn reveal" id="nb-open" href="Analysis.ipynb" target="_blank" rel="noopener">
     Open the explainer notebook
     <span class="ic">&rarr;</span>
   </a>
@@ -878,8 +878,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
           <span class="ds-sub">same films + Wikipedia plot &amp; critical-reception text · ~32 MB</span>
         </span>
       </a>
-      <a class="nb-dl-btn" href="Analysis-3.ipynb" target="_blank" rel="noopener">
-        <span><b>Analysis-3.ipynb</b>
+      <a class="nb-dl-btn" href="Analysis.ipynb" target="_blank" rel="noopener">
+        <span><b>Analysis.ipynb</b>
           <span class="ds-sub">the explainer notebook source · run top-to-bottom to regenerate this site</span>
         </span>
       </a>
@@ -894,7 +894,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <ol>
       <li><b>&sect;1 Motivation</b> &mdash; what the dataset is, why we chose it, what the end user should learn.</li>
       <li><b>&sect;2 Basic stats</b> &mdash; how the data was collected (TMDb API &sect;2.1, Wikipedia API &sect;2.2, filter + CPI inflation &sect;2.3); cleaning choices; dataset shape; network properties; log-log degree distribution; Zipf rank-frequency on the review corpus.</li>
-      <li><b>&sect;3 Tools, theory &amp; analysis</b> &mdash; community detection (greedy modularity); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index-3.html</code>.</li>
+      <li><b>&sect;3 Tools, theory &amp; analysis</b> &mdash; community detection (Louvain); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index.html</code>.</li>
       <li><b>&sect;4 Discussion</b> &mdash; what went well, what's still missing, ethical limits &mdash; same content as this Discussion tab.</li>
     </ol>
   </div>
@@ -1077,7 +1077,7 @@ function renderNullComparison(){
   if(read){
     const dPart = (+t.observed_modularity) - (+t.config_modularity.mean);
     const dNat  = (+t.observed_modularity) - (+cfg_native.mean);
-    read.innerHTML = `<b>Read it (two tests in one).</b> Under our <em>observed partition</em>, random rewiring drops modularity to ~0 (a ${dPart.toFixed(2)}-point gap) &mdash; rigorous statistical proof that the communities we found are real. Under <em>native detection</em> (running greedy modularity on the random graph itself, the framing from the week-6 exercises), the null still finds modularity ~${(+cfg_native.mean).toFixed(2)} thanks to the resolution-limit artefact, and our observed 0.71 is ${dNat.toFixed(2)} above it &mdash; still a real signal, calibrated against the standard baseline.`;
+    read.innerHTML = `<b>Read it (two tests in one).</b> Under our <em>observed partition</em>, random rewiring drops modularity to ~0 (a ${dPart.toFixed(2)}-point gap) &mdash; rigorous statistical proof that the communities we found are real. Under <em>native detection</em> (running Louvain on the random graph itself, the framing from the week-6 exercises), the null still finds modularity ~${(+cfg_native.mean).toFixed(2)} thanks to the resolution-limit artefact, and our observed ${(+t.observed_modularity).toFixed(2)} is ${dNat.toFixed(2)} above it &mdash; still a real signal, calibrated against the standard baseline.`;
   }
   // Strip 2 — track-aware attribute assortativity
   if(aGrid && d.attribute_assortativity){
@@ -1202,7 +1202,7 @@ function wireNotebookLinks(){
   // local file so the link always works for viewers running the site locally.
   const PLACEHOLDER = /Vaksth\/comsocsci2026_final_project/;
   let url = (D && D.notebook_url) || '';
-  if(!url || PLACEHOLDER.test(url)) url = 'Analysis-3.ipynb';
+  if(!url || PLACEHOLDER.test(url)) url = 'Analysis.ipynb';
   const open = document.getElementById('nb-open');
   if(open) open.href = url;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
@@ -1486,15 +1486,15 @@ function drawTF(){
   TF_CHARTS.forEach((c, i) => drawLineChart(c, i));
 }
 
-// ── interactive network (canvas, static spring layout) ───────────
-// Renders the precomputed networkx spring_layout coordinates directly onto a
-// <canvas>. No d3-force simulation runs — node positions are stable across
-// filter changes and slider tweaks. Interactivity (hover, drag, pan, zoom) is
+// ── interactive network (canvas, D3-force layout) ───────────────
+// Node positions are computed by a synchronous D3-force simulation.
+// Positions are cached by (commFilter, minEdgeWeight) so panning/zooming
+// and slider tweaks are instant. Interactivity (hover, drag, pan, zoom) is
 // implemented on the canvas. Quadtree gives sub-millisecond hit-testing.
 const NET = {
   canvas: null, ctx: null, dpr: 1,
   cssW: 0, cssH: 0,
-  VW: 1000, VH: 620,          // virtual coordinate space (matches old viewBox)
+  VW: 1200, VH: 750,          // virtual coordinate space
   fit: { k: 1, x: 0, y: 0 },  // letterbox transform: virtual → canvas pixels
   transform: { k: 1, x: 0, y: 0 }, // user pan/zoom (applied AFTER fit)
   nodes: [], edges: [], labels: [],
@@ -1561,7 +1561,7 @@ function _resizeCanvas(){
   const wrap = NET.canvas.parentElement;
   const dpr = NET.dpr = window.devicePixelRatio || 1;
   const cssW = wrap.clientWidth || 0;
-  const cssH = 620;
+  const cssH = 750;
   if(cssW < 80){ NET.cssW = 0; return; }   // hidden tab — wait for visibility
   NET.cssW = cssW; NET.cssH = cssH;
   NET.canvas.style.width  = cssW + 'px';
@@ -1724,7 +1724,7 @@ function _paintNetwork(){
     if(hover){
       // Single dim pass for non-touching edges across all buckets, then a
       // bright amber highlight for edges incident to the hovered node.
-      ctx.strokeStyle = `rgba(244,241,234,${Math.max(0.02, 0.045 * es)})`;
+      ctx.strokeStyle = `rgba(124,124,124,${Math.max(0.02, 0.045 * es)})`;
       ctx.lineWidth = 0.45 * invK;
       ctx.beginPath();
       for(const bucket of NET.edgeBuckets){
@@ -1747,7 +1747,7 @@ function _paintNetwork(){
     } else {
       for(const bucket of NET.edgeBuckets){
         if(!bucket.edges.length) continue;
-        ctx.strokeStyle = `rgba(244,241,234,${bucket.alpha})`;
+        ctx.strokeStyle = `rgba(124,124,124,${bucket.alpha})`;
         ctx.lineWidth = bucket.width * invK;
         ctx.beginPath();
         for(const e of bucket.edges){
@@ -1768,8 +1768,8 @@ function _paintNetwork(){
     ctx.fill();
     ctx.globalAlpha = 1;
     if(!dim){
-      ctx.strokeStyle = 'rgba(10,10,12,0.7)';
-      ctx.lineWidth = 0.55 * invK;
+      ctx.strokeStyle = '#555555';
+      ctx.lineWidth = 1 * invK;
       ctx.stroke();
     }
   }
@@ -1819,9 +1819,10 @@ function updateNodeScale(){
   const vals = NET.nodes.map(d => Math.max(0, +d[NET.mode] || 0));
   const r = d3.scalePow().exponent(exponent)
     .domain([0, d3.max(vals) || 1])
-    .range([2.4 * ns, 22 * ns]);
+    .range([0.5 * ns, 20 * ns]);
   NET.r = r;
   NET.nodes.forEach(n => { n.pr = r(+n[NET.mode] || 0); });
+
   _paintNetwork();
 }
 function _bucketEdges(){
@@ -1845,7 +1846,7 @@ function _bucketEdges(){
   for(let i = 0; i < TIERS; i++){
     const t = TIERS === 1 ? 0.5 : i / (TIERS - 1);   // 0..1
     buckets[i].alpha = Math.min(0.95, (0.045 + 0.22 * t) * es);
-    buckets[i].width = 0.40 + 1.10 * t;              // px (before invK scaling)
+    buckets[i].width = 1.5 + 1.0 * t;               // px (before invK scaling) — netwulf link_width 2, variation 0.5
   }
   NET.edgeBuckets = buckets;
 }
@@ -1925,66 +1926,13 @@ function drawInteractiveNetwork(){
     return;
   }
 
-  // ── Static spring layout from networkx ─────────────────────────
-  // Use the precomputed (n.x, n.y) coordinates directly — same layout the
-  // matplotlib PNGs use. No d3-force, no jitter, repeatable across reloads.
-  const xs = d3.extent(nodes, d => +d.x);
-  const ys = d3.extent(nodes, d => +d.y);
-  const sx = d3.scaleLinear().domain(xs).range([60, NET.VW - 60]);
-  const sy = d3.scaleLinear().domain(ys).range([60, NET.VH - 60]);
-  nodes.forEach(n => { n.px = sx(+n.x); n.py = sy(+n.y); });
-
-  // Re-layout when a single community is isolated: the static spring
-  // coordinates were computed for the FULL graph, so a community's members
-  // are scattered across the canvas and rescaling a sparse subset just
-  // spreads it thin. Run a short force relaxation on the subgraph so the
-  // cluster reads as a coherent group, centred in the viewport.
-  if(commFilter !== '' && !Number.isNaN(+commFilter) && nodes.length > 1 && nodes.length <= 1200){
-    const cx = NET.VW / 2, cy = NET.VH / 2;
-    const idMap = new Map(nodes.map(n => [n.id, n]));
-    const simEdges = [];
-    for(const e of edges){
-      const s = typeof e.source === 'object' ? e.source.id : e.source;
-      const t = typeof e.target === 'object' ? e.target.id : e.target;
-      if(idMap.has(s) && idMap.has(t)) simEdges.push({ source: idMap.get(s), target: idMap.get(t), weight: +e.weight || 1 });
-    }
-    nodes.forEach(n => { n.x = n.px; n.y = n.py; });
-    const sim = d3.forceSimulation(nodes)
-      .force('charge', d3.forceManyBody().strength(-120))
-      .force('link', d3.forceLink(simEdges).id(d => d.id)
-        .distance(d => 40 / Math.sqrt(d.weight)).strength(0.6))
-      .force('center', d3.forceCenter(cx, cy))
-      .force('collide', d3.forceCollide().radius(10))
-      .stop();
-    const ticks = Math.min(220, 60 + nodes.length);
-    for(let i = 0; i < ticks; i++) sim.tick();
-    // Refit the relaxed cloud to the viewport with margins
-    let rxs = d3.extent(nodes, d => d.x);
-    let rys = d3.extent(nodes, d => d.y);
-    if(!(rxs[1] > rxs[0])) rxs = [rxs[0] - 1, rxs[0] + 1];
-    if(!(rys[1] > rys[0])) rys = [rys[0] - 1, rys[0] + 1];
-    const rsx = d3.scaleLinear().domain(rxs).range([80, NET.VW - 80]);
-    const rsy = d3.scaleLinear().domain(rys).range([80, NET.VH - 80]);
-    nodes.forEach(n => {
-      const px = rsx(n.x), py = rsy(n.y);
-      n.px = Number.isFinite(px) ? px : NET.VW / 2;
-      n.py = Number.isFinite(py) ? py : NET.VH / 2;
-    });
-  }
-
-  // Community-coloured fills (same 17-colour palette as the static PNGs)
-  const palette = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffb300','#a65628','#f781bf','#999999','#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3'];
-  nodes.forEach(n => { n.color = palette[(+n.community || 0) % palette.length]; });
-
-  // Radii: overall-size slider × scalePow with exponent from the relative-size slider
+  // Radii: compute sizes FIRST so the force simulation can use actual node
+  // sizes as collision radii — prevents overlap from the start.
   const ns = _readSlider('node-scale', 1);
   const nr = _readSlider('node-relative', 1);
   _writeLabel('node-scale-val',    ns.toFixed(1) + '×');
   _writeLabel('node-relative-val', nr.toFixed(1) + '×');
   const exponent = 0.5 * nr;                          // 1.0 → 0.5 (sqrt, default)
-  // Year-window aware node value. If the release-year window is the full
-  // span, use the precomputed career total/avg (d[mode]); otherwise sum
-  // (absolute) or average (per-year) only the years inside the window.
   const yrAll = (D.network && D.network.years) || [];
   const yMinEl = document.getElementById('yr-min');
   const yMaxEl = document.getElementById('yr-max');
@@ -2008,11 +1956,54 @@ function drawInteractiveNetwork(){
   const vals = nodes.map(d => Math.max(0, d._wval || 0));
   const r = d3.scalePow().exponent(exponent)
     .domain([0, d3.max(vals) || 1])
-    .range([2.4 * ns, 22 * ns]);
+    .range([0.5 * ns, 20 * ns]);
   nodes.forEach(n => {
     const rr = r(Math.max(0, n._wval || 0));
-    n.pr = (Number.isFinite(rr) && rr > 0) ? rr : 1;
+    n.pr = (Number.isFinite(rr) && rr > 0) ? rr : 0.1;
   });
+
+  // Community-coloured fills (same 17-colour palette as the static PNGs)
+  const palette = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffb300','#a65628','#f781bf','#999999','#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3'];
+  nodes.forEach(n => { n.color = palette[(+n.community || 0) % palette.length]; });
+
+  // ── D3-force layout (collision radius = actual node size) ────────────
+  // Positions cached by (commFilter, minW) — slider tweaks run only the
+  // short relaxation in updateNodeScale, not this full simulation.
+  const _posKey = commFilter + '|' + minW;
+  if(NET._posCache && NET._posCache.key === _posKey && NET._posCache.map.size === nodes.length){
+    const cached = NET._posCache.map;
+    nodes.forEach(n => { const p = cached.get(n.id); if(p){ n.px = p[0]; n.py = p[1]; } });
+  } else {
+    const cx = NET.VW / 2, cy = NET.VH / 2;
+    const idMap = new Map(nodes.map(n => [n.id, n]));
+    const simEdges = [];
+    for(const e of edges){
+      const s = typeof e.source === 'object' ? e.source.id : e.source;
+      const t = typeof e.target === 'object' ? e.target.id : e.target;
+      const sn = idMap.get(s), tn = idMap.get(t);
+      if(sn && tn) simEdges.push({ source: sn, target: tn, weight: +e.weight || 1 });
+    }
+    // Seeded pseudo-random spread (Mulberry32) — avoids the border-ring artifact
+    // that a circle seed produces when 2500+ nodes have sub-pixel spacing.
+    let _s = 42;
+    const _rnd = () => { _s |= 0; _s = _s + 0x6D2B79F5 | 0; let t = Math.imul(_s ^ _s >>> 15, 1 | _s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const pad = 80;
+    nodes.forEach(n => { n.x = pad + _rnd() * (NET.VW - 2*pad); n.y = pad + _rnd() * (NET.VH - 2*pad); });
+    const ticks = nodes.length > 1500 ? 200 : nodes.length > 500 ? 300 : 400;
+    const sim = d3.forceSimulation(nodes)
+      .force('charge', d3.forceManyBody().strength(-30))
+      .force('link', d3.forceLink(simEdges).id(d => d.id).distance(5).strength(0.4))
+      .force('x', d3.forceX(cx).strength(0.1))
+      .force('y', d3.forceY(cy).strength(0.1))
+      .force('collide', d3.forceCollide().radius(d => d.pr + 2).strength(1.0))
+      .stop();
+    for(let i = 0; i < ticks; i++) sim.tick();
+    nodes.forEach(n => {
+      n.px = Number.isFinite(n.x) ? n.x : cx;
+      n.py = Number.isFinite(n.y) ? n.y : cy;
+    });
+    NET._posCache = { key: _posKey, map: new Map(nodes.map(n => [n.id, [n.px, n.py]])) };
+  }
 
   // Resolve edge endpoints to node objects (so paint can read .px / .py)
   const byId = new Map(nodes.map(n => [n.id, n]));

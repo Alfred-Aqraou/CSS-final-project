@@ -9,3 +9,4 @@ vaderSentiment==3.3.2
 netwulf==0.1.5
 python-louvain==0.16
 cpi==2.0.10
+spacy==3.7.4

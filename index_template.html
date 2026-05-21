@@ -728,7 +728,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     </div>
     <div class="c3">
       <div class="n" id="s-va">+.01</div>
-      <p>standardised β for critical rating <span id="s-val"></span>. This near-zero value under Track A shows that critical quality barely moves the needle on raw revenue; it rises under Track B once year-effects are removed.</p>
+      <p>Spearman ρ for critical rating <span id="s-val"></span>. Under Track A, critical rating shows a moderate positive correlation with absolute revenue — smaller than audience reach, but not negligible. Under Track B it gains weight: once films are judged within their release year, quality becomes a more reliable separator.</p>
     </div>
   </div>
 
@@ -965,7 +965,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Communities × Language</div>
   <h2>What each <em>cluster</em> is about</h2>
-  <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster three ways at once: its three most prolific people, its three highest-grossing <b>signature films</b>, and its most distinctive plot vocabulary. IDF is computed across the full 3,781-film corpus (not within communities) so generic words don't dominate; chi-squared collocations from notebook §3.6.5 are merged into single tokens so multi-word phrases can surface (e.g. <em>tony_stark</em>). Methodology in §3.5–3.7 of the explainer notebook.</p></div>
+  <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster by its three highest-grossing <b>signature films</b> and its most distinctive plot vocabulary. IDF is computed across the full 3,781-film corpus (not within communities) so generic words don't dominate; chi-squared collocations from notebook §3.6.5 are merged into single tokens so multi-word phrases can surface (e.g. <em>tony_stark</em>). Methodology in §3.5–3.7 of the explainer notebook.</p></div>
   <div class="pc-block reveal">
     <div class="pc-grid" id="pc-grid"></div>
   </div>
@@ -983,7 +983,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Plot Themes</div>
   <h2>Scale vs <em>life</em></h2>
-  <p class="body-lg">Wikipedia plot summaries, TF-IDF by the active track. The cleaning step strips wiki / HTML markup but does <em>not</em> remove proper nouns &mdash; so character names like <em>ethan</em>, <em>peter</em> and <em>jack</em> appear in the high-success column because Mission Impossible, Spider-Man and Reacher franchises do. A higher-level "named-entity strip" is listed in the notebook's §4 as a worthwhile follow-up.</p></div>
+  <p class="body-lg">Wikipedia plot summaries, TF-IDF by the active track. The cleaning step strips wiki / HTML markup and applies a name-stop extension (cast names, NLTK names corpus, spaCy NER) so character names are filtered from the vocabulary. Multi-word collocations are merged via chi-squared selection and <code>MWETokenizer</code> (§3.6.5) so compound phrases surface as single tokens. What remains reflects narrative genre and plot structure rather than franchise brand names.</p></div>
   <div class="wc-block reveal"><div class="wc-grid">
     <div class="wc hi"><div class="h"><span>High success</span><span class="pct">top 10%</span></div><img id="wc-plt-h"><div class="terms" id="t-plt-h"></div></div>
     <div class="wc lo"><div class="h"><span>Low success</span><span class="pct">bottom 10%</span></div><img id="wc-plt-l"><div class="terms" id="t-plt-l"></div></div>
@@ -1007,10 +1007,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Caveats</div><h2>What this <em>cannot</em> claim</h2></div>
   <div class="lims">
-    <div class="lim reveal"><h3>Correlation, not causation</h3><p>Associations with success, not causes. Studios give franchises the budgets and releases that drive the result.</p></div>
-    <div class="lim reveal"><h3>Survivorship bias</h3><p>Only films with theatrical release and ≥$1M revenue. Failed projects are invisible.</p></div>
-    <div class="lim reveal"><h3>US / TMDb skew</h3><p>English-language, US-centric. Wiki critical sections cover 77% of films, biased to notable titles.</p></div>
     <div class="lim reveal"><h3>Metric agreement</h3><p>The two tracks correlate <span id="cv-track-rho">ρ≈0.98</span>, so findings are robust &mdash; but the per-year R² (<span id="cv-r2-b">38%</span>) shows success is harder to predict fairly than the absolute view (<span id="cv-r2-a">59%</span>) suggests.</p></div>
+    <div class="lim reveal"><h3>Associations, not causes</h3><p>Every signal here is correlational. Survivorship bias, US/TMDb skew, and the distinction between correlation and causation are covered in the <a href="#discussion" onclick="setActiveTab('discussion');return false;" style="color:#46d6e0">Discussion tab</a>.</p></div>
   </div>
 </div></section>
 
@@ -1035,7 +1033,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <h4>What went well</h4>
       <ul>
         <li><b>Two-track methodology pays off</b> &mdash; rankings shift visibly between Track A and Track B, validating the inflation-fairness argument.</li>
-        <li><b>The network has real structure</b> &mdash; observed modularity 0.71 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
+        <li><b>The network has real structure</b> &mdash; observed modularity 0.73 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
         <li><b>Successful people cluster</b> &mdash; Newman attribute assortativity sharply positive and far outside the label-shuffle null under both tracks.</li>
         <li><b>Per-community vocabulary is interpretable</b> &mdash; corpus-wide IDF + bigrams surface coherent cluster vocabularies (MCU, Fast &amp; Furious, X-Men/LOTR), the network &times; text integration the rubric asks for.</li>
       </ul>
@@ -1044,7 +1042,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="disc-card reveal">
       <h4>What could be improved</h4>
       <ul>
-        <li><b>Bigger collocation vocabulary</b> &mdash; we rely on TF-IDF bigrams; an explicit chi-squared collocation pass with MWETokenizer (week 7) would catch trigrams too.</li>
+        <li><b>Bigger collocation vocabulary</b> &mdash; chi-squared collocations with <code>MWETokenizer</code> are applied to the plot corpus (notebook §3.6.5). Extending the same pass to the review and critic corpora, and capturing trigrams, would widen coverage.</li>
         <li><b>Gender / diversity attributes</b> &mdash; names are baked in via <code>top_cast</code> but not modelled. A gender-labelled audit would let us study disassortativity by gender.</li>
         <li><b>Sequel / franchise flag</b> &mdash; isolating first-of-franchise vs sequel films would refine the "IP backed" finding.</li>
         <li><b>Foreign-language films</b> &mdash; the dataset is US-theatrical only.</li>
@@ -1079,7 +1077,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <span class="ic">&rarr;</span>
   </a>
   <p class="ds-sub" style="margin-top:10px;color:#6a675f;font-size:11.5px;max-width:680px">
-    The button opens the notebook on GitHub, which renders <code>.ipynb</code> files natively in the browser. If you prefer the nbviewer renderer (occasional rate limits), the equivalent URL is <code>https://nbviewer.org/github/Alfred-Aqraou/CSS-final-project/blob/main/Analysis.ipynb</code>.
+    The button opens the notebook on nbviewer, which renders <code>.ipynb</code> outputs and plots inline. If nbviewer is slow, the same file renders natively on <a href="https://github.com/Alfred-Aqraou/CSS-final-project/blob/main/Analysis.ipynb" target="_blank" rel="noopener" style="color:#46d6e0">GitHub</a>.
   </p>
 
   <div class="nb-downloads reveal">

@@ -44,7 +44,6 @@ body.track-b .tabs button[data-target].active{background:var(--cyan);border-colo
 section{border-top:1px solid var(--line)}
 /* Hide the legacy fixed-position switcher (replaced by .tabs .track-switch) */
 body > .switcher{display:none !important}
-
 /* sticky track switcher */
 .switcher{position:fixed;top:18px;right:24px;z-index:900;display:flex;gap:0;
 background:rgba(20,20,24,.92);backdrop-filter:blur(10px);border:1px solid var(--line);
@@ -501,7 +500,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <header class="hero"><div class="wrap">
   <div class="kicker reveal">02467 Computational Social Science · Project Assignment B</div>
   <h1 class="reveal">Recipe for<br><em>high-grossing</em><br>movies</h1>
-  <p class="lede reveal">Box-office success is hard to compare across decades: a 2001 release lives in a different market than a 2024 release. This project first builds a fair, year-aware measure of success, then tests 3,781 US theatrical films through four lenses — <b>attributes</b>, <b>network</b>, <b>plots</b>, <b>reviews</b> — to find the patterns that hold up under <b>both definitions of success</b>.</p>
+  <p class="lede reveal">Box-office success is hard to compare across decades: a 2001 release lives in a different market than a 2024 release. This project first builds a fair, year-aware measure of success, then tests 3,781 US theatrical films across four lenses (<b>attributes</b>, <b>network</b>, <b>plots</b>, <b>reviews</b>) to find the patterns that hold up under <b>both definitions of success</b>.</p>
   <div class="meta reveal">
     <span><b>3,781</b>US films · 2000–present</span>
     <span><b>2 metrics</b>absolute & per-year</span>
@@ -541,12 +540,12 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     </div>
 
     <div class="ds-sub-h"><span class="num">b · Provenance</span><h4>How it was assembled</h4></div>
-    <p class="ds-sub-lede">Two extraction pipelines and one inflation pass, all reproducible from the notebook. Re-running is gated behind <code>RUN_API_EXTRACTION = False</code> — the cached CSVs in the repo are loaded by default.</p>
+    <p class="ds-sub-lede">Two extraction pipelines and one inflation pass, all reproducible from the notebook. Re-running is gated behind <code>RUN_API_EXTRACTION = False</code>; the cached CSVs in the repo are loaded by default.</p>
     <div class="ds-cols">
       <div><b>Source · TMDb.</b> Revenue, budget, runtime, vote counts, audience reviews, top-cast, directors, genres, production companies. Extracted in §2.1 via the <code>/movie/{id}</code> endpoint with <code>credits,reviews,release_dates</code> appended, 100-thread concurrent batches, 100-req/s rate-limit safety.</div>
       <div><b>Source · Wikipedia.</b> Plot summaries and critical-reception sections retrieved via the MediaWiki API in §2.2. Title resolution by search + page-parse; section text isolated by regex on level-2 headings. Global rate-limit lock to stay under 150 req/min, checkpointed every 200 rows.</div>
       <div><b>Inflation adjustment.</b> CPI from FRED series <code>CPIAUCSL</code>. <code>box_office_surplus_adj_2026 = (revenue − budget) × CPI<sub>2026</sub> / CPI<sub>release_year</sub></code>. Methodology in §2.3.</div>
-      <div><b>Two success metrics ("tracks").</b> Track A = absolute inflation-adjusted profit. Track B = each film's rank within its release year (time-invariant). The site lets you switch between the two — toggle top-right.</div>
+      <div><b>Two success metrics ("tracks").</b> Track A = absolute inflation-adjusted profit. Track B = each film's rank within its release year (time-invariant). Use the toggle top-right to switch between them.</div>
     </div>
 
     <div class="ds-sub-h"><span class="num">c · Schema</span><h4>Attributes we use</h4></div>
@@ -590,7 +589,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       </div>
 
     </div>
-    <p class="attr-foot"><b>Kept for provenance but not modelled.</b> <code>overview</code> (TMDb's short blurb — superseded by the longer Wikipedia plot), <code>production_companies</code> (extracted but not analysed), <code>us_regular_theatrical</code> (used as a row-level filter — every kept film has it true), and the identifier columns <code>tmdb_id</code>, <code>title</code>, <code>release_date</code>.</p>
+    <p class="attr-foot"><b>Kept for provenance but not modelled.</b> <code>overview</code> (TMDb's short blurb, superseded by the longer Wikipedia plot), <code>production_companies</code> (extracted but not analysed), <code>us_regular_theatrical</code> (used as a row-level filter; every kept film has it true), and the identifier columns <code>tmdb_id</code>, <code>title</code>, <code>release_date</code>.</p>
   </div>
 </div></section>
 
@@ -601,8 +600,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <h2>Two ways of <em>accounting for time</em></h2>
   <p class="body-lg">Before asking what successful films have in common, we have to decide what <b>"successful"</b> means. A 2001 dollar, a 2025 blockbuster market, and a pandemic-era release year are not directly comparable, so the analysis follows two tracks throughout. Only patterns that survive <em>both</em> reach the final recipe.</p></div>
   <div class="method">
-    <div class="mcard a reveal"><h3>Track A — Whole period</h3><div class="fm">metric = inflation-adjusted profit ($2026)</div><p>Every film's revenue minus budget, expressed in 2026 dollars. Absolute scale: how much money, comparable across 25 years.</p></div>
-    <div class="mcard b reveal"><h3>Track B — Per-year relative</h3><div class="fm">metric = profit percentile within release year</div><p>Each film ranked 0–100 against only the films it competed with that year. Removes the year effect entirely — pure relative success.</p></div>
+    <div class="mcard a reveal"><h3>Track A: Whole period</h3><div class="fm">metric = inflation-adjusted profit ($2026)</div><p>Every film's revenue minus budget, expressed in 2026 dollars. Absolute scale: how much money, comparable across 25 years.</p></div>
+    <div class="mcard b reveal"><h3>Track B: Per-year relative</h3><div class="fm">metric = profit percentile within release year</div><p>Each film ranked 0–100 against only the films it competed with that year. This removes the year effect entirely: pure relative success.</p></div>
   </div>
 
   <p class="chart-lead reveal">A single picture motivates the dual-track design. The chart below counts, for each release year, how many films enter the <b>top 10%</b> under three competing definitions of success. If a definition were truly fair across time, the count would sit close to a constant: roughly one in ten of that year's cohort, every year.</p>
@@ -617,7 +616,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="tflegend" id="tflegend-1"></div>
   </div>
 
-  <p class="body-lg reveal" style="margin-top:30px">Per-year percentile is flat by design. The raw and adjusted curves are not, which is exactly the problem Track B exists to solve. The Attributes tab applies both tracks to the actual film-level features — popularity, budget, rating, runtime, genre — to see which signals survive both fairness conventions.</p>
+  <p class="body-lg reveal" style="margin-top:30px">Per-year percentile is flat by design. The raw and adjusted curves are not, which is exactly the problem Track B exists to solve. The Attributes tab applies both tracks to the actual film-level features (popularity, budget, rating, runtime, genre) to see which signals survive both fairness conventions.</p>
 </div></section>
 
 </div>
@@ -627,28 +626,28 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <h2>What the numbers <em>actually</em> reward</h2>
   <span class="tbadge a aonly inl"><span class="dot"></span>Track A · inflation-adjusted profit</span>
   <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year percentile</span>
-  <p class="body-lg" style="margin-top:14px">With two fair definitions of success in hand, the first concrete question is the simplest: which film-level attributes actually correlate with each? We rank four numeric features — audience vote count, inflation-adjusted budget, critical rating, and runtime — by Spearman ρ against the active track's success metric, then re-cut the data by genre and by budget tier. The three numbers below summarise how much of success these attributes capture, and where the picture changes between Track A and Track B.</p>
-  <p class="body-lg" style="margin-top:10px"><span class="aonly inl">Under absolute profit, raw popularity dominates and a four-feature linear model explains <b>59%</b> of the variance — but this is also the track inflated by time, so part of that fit is the chart-topping recent franchises.</span><span class="bonly inl">Judged per-year, popularity weakens and <b>critical rating jumps in importance</b>. The four-feature model now explains <b>38%</b>: a harder, fairer target that better separates films from their year, not from history.</span></p></div>
+  <p class="body-lg" style="margin-top:14px">With two fair definitions of success in hand, the first concrete question is the simplest: which film-level attributes actually correlate with each? We rank four numeric features (audience vote count, inflation-adjusted budget, critical rating and runtime) by Spearman ρ against the active track's success metric, then re-cut the data by genre and by budget tier. The three numbers below summarise how much of success these attributes capture, and where the picture changes between Track A and Track B.</p>
+  <p class="body-lg" style="margin-top:10px"><span class="aonly inl">Under absolute profit, raw popularity dominates and a four-feature linear model explains <b>59%</b> of the variance, though this track is inflated by time and part of that fit reflects chart-topping recent franchises.</span><span class="bonly inl">Judged per-year, popularity weakens and <b>critical rating jumps in importance</b>. The four-feature model now explains <b>38%</b>: a harder, fairer target that better separates films from their year, not from history.</span></p></div>
 
   <div class="stats reveal">
     <div class="c1">
       <div class="n" id="s-r2">59%</div>
-      <p>of success variance explained by just four numeric attributes (popularity, budget, rating, runtime) — the fit, not the recipe</p>
+      <p>of success variance explained by just four numeric attributes (popularity, budget, rating, runtime). This is the fit, not the recipe</p>
     </div>
     <div class="c2">
       <div class="n" id="s-vc">0.70</div>
-      <p>Spearman ρ for the top correlate, <span id="s-vcl">audience vote count</span> — a proxy for "people are talking about this film"</p>
+      <p>Spearman ρ for the top correlate, <span id="s-vcl">audience vote count</span>, a proxy for how much a film is being talked about</p>
     </div>
     <div class="c3">
       <div class="n" id="s-va">+.01</div>
-      <p>standardised β for critical rating <span id="s-val"></span> — near-zero under Track A, materially positive under Track B (quality only counts once scale is held constant)</p>
+      <p>standardised β for critical rating <span id="s-val"></span>. Near-zero under Track A, materially positive under Track B: quality matters more once scale is controlled for</p>
     </div>
   </div>
 
-  <p class="body-lg reveal" style="margin-top:30px">The chart below makes the ranking concrete. Bars extend rightward for positive Spearman correlation; switching the active track at the top of the page reshuffles the order in place. Watch <b>vote count</b> shrink and <b>critical rating</b> grow as you move from absolute dollars to per-year percentile — the single biggest shift on this page.</p>
+  <p class="body-lg reveal" style="margin-top:30px">The chart below makes the ranking concrete. Bars extend rightward for positive Spearman correlation; switching the active track at the top of the page reshuffles the order in place. Watch <b>vote count</b> shrink and <b>critical rating</b> grow as you move from absolute dollars to per-year percentile. This is the single biggest shift on this page.</p>
   <div class="chart-card reveal">
     <h4>Attribute correlation with success</h4>
-    <div class="cs">Spearman ρ between each numeric feature and the active success metric — <span id="corr-track">Track A · inflation-adjusted profit</span>. Range −1 (perfect inverse) to +1 (perfect agreement); zero = no monotonic relationship.</div>
+    <div class="cs">Spearman ρ between each numeric feature and the active success metric (<span id="corr-track">Track A · inflation-adjusted profit</span>). Range −1 (perfect inverse) to +1 (perfect agreement); zero = no monotonic relationship.</div>
     <div class="bars" id="corrbars"></div>
   </div>
 </div></section>
@@ -657,15 +656,15 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="reveal"><div class="tag">02 · Budget</div>
   <h2>Two strategies, one <em>valley</em></h2>
   <p class="body-lg">Films are sorted into five equal-population budget tiers (inflation-adjusted), each holding roughly 750 titles, from cheapest (Q1) to priciest (Q5). The three panels below report the median outcome inside each tier under the active track.</p>
-  <p class="body-lg aonly">Under absolute profit, the ROI curve is U-shaped: cheap films return most per dollar (low denominators flatter the ratio), mega-budgets are the safest absolute earners, and the middle bleeds — large enough to need a real audience, not large enough to dominate marketing share-of-voice.</p>
-  <p class="body-lg bonly">Per-year, the curve is near-monotonic: bigger budgets buy higher relative rank almost linearly. Inside a single release year, scale is the surest way to beat your cohort — the mid-budget valley flattens out once we stop comparing across decades.</p></div>
+  <p class="body-lg aonly">Under absolute profit, the ROI curve is U-shaped: cheap films return most per dollar (low denominators flatter the ratio), mega-budgets are the safest absolute earners, and the middle bleeds. Mid-range films need a real audience but are not large enough to dominate marketing share-of-voice.</p>
+  <p class="body-lg bonly">Per-year, the curve is near-monotonic: bigger budgets buy higher relative rank almost linearly. Inside a single release year, scale is the surest way to beat your cohort. The mid-budget valley flattens out once we stop comparing across decades.</p></div>
   <div class="trio" id="budgettrio"></div>
 </div></section>
 
 <section><div class="wrap">
   <div class="reveal"><div class="tag">02 · Genre</div>
   <h2>Genre sets the <em>ceiling</em></h2>
-  <p class="body-lg">Median success by genre, ranked under the active track. <span class="aonly inl">Track A reports median inflation-adjusted profit per film: animation, adventure and sci-fi lead because they're produced at scale, open wide, and lean on enduring IP.</span><span class="bonly inl">Track B reports median per-year percentile (50 = an average film for its year): the same big-tent genres still lead, but documentaries and dramas — typically modest in absolute dollars — climb the table once each film is judged against its own year's cohort.</span> The strongest signal in both views: animation tops the ranking either way.</p></div>
+  <p class="body-lg">Median success by genre, ranked under the active track. <span class="aonly inl">Track A reports median inflation-adjusted profit per film: animation, adventure and sci-fi lead because they're produced at scale, open wide, and lean on enduring IP.</span><span class="bonly inl">Track B reports median per-year percentile (50 = an average film for its year): the same big-tent genres still lead, but documentaries and dramas (typically modest in absolute dollars) climb the table once each film is judged against its own year's cohort.</span> The strongest signal in both views: animation tops the ranking either way.</p></div>
   <div class="chart-card reveal">
     <h4 id="genre-h">Genre ranking</h4><div class="cs" id="genre-cs"></div>
     <div class="bars" id="genrebars"></div>

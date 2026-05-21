@@ -1220,7 +1220,7 @@ function renderNullComparison(){
         ${barRow('Observed network','',p(obsClus),'#5fcf80',obsClus.toFixed(3),'#5fcf80')}
         ${barRow('Configuration null','degree-preserving',p(cfgClus.mean),'#8a8880','~'+cfgClus.mean.toFixed(3),'#9a978f')}
         ${barRow('Erdős–Rényi null','totals only',p(erClus.mean),'#5a5855','~'+erClus.mean.toFixed(3),'#6a6865')}
-        <div class="null-bar-interp">Collaborators of a collaborator are ~${clusteringRatio}× more likely to have worked together directly than chance predicts. The same cast and crew reunite across films — recurring circles are the basic unit of the collaboration economy.</div>
+        <div class="null-bar-interp">The clustering coefficient measures how often two of a person's collaborators have also worked with each other directly. Our observed value (${obsClus.toFixed(3)}) is <b>~${clusteringRatio}× higher</b> than the degree-preserving null (~${cfgClus.mean.toFixed(3)}): local triangles form far more often than degree distribution alone would predict — the same people repeatedly reconvene across projects.</div>
       </div>`;
   }
   if(read) read.innerHTML = '';

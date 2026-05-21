@@ -515,7 +515,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   background:transparent;padding:0 2px;border:0}
 
 /* Lens label inside the .rq question list */
-.rq .sub li b{color:var(--ink);font-weight:600;margin-right:4px}
+.rq .sub li b{color:var(--ink);font-weight:600;margin-right:4px;white-space:nowrap}
 
 /* Chart-card "callout" lead-in (Methodology) */
 .chart-lead{margin:30px 0 -6px;color:var(--mute);font-size:.98rem;line-height:1.65;max-width:760px}
@@ -1337,6 +1337,1297 @@ function renderCentralityTable(){
     }).join('');
   }
   grid.innerHTML = html;
+}
+
+function renderPerCommunity(){
+  // Card per cluster: top-3 signature films + most distinctive plot terms
+  // (bigram-filtered where possible).  Option C from the design discussion.
+  const grid = document.getElementById('pc-grid');
+  if(!grid) return;
+  const data = (D && D.per_community_tfidf) || [];
+  if(!data.length){
+    grid.innerHTML = '<div class="pc-card"><div class="pc-label">Run the notebook to populate per-community TF-IDF.</div></div>';
+    return;
+  }
+  grid.innerHTML = data.map(c => {
+    const sig = (c.signature_films || []).map(f =>
+      `<li><b>${f.title}</b><span class="pc-year"> (${f.year})</span></li>`).join('');
+    return `
+    <div class="pc-card">
+      <div class="pc-label">${c.label || ('Community ' + c.community_id)}</div>
+      <div class="pc-meta">${c.n_films} films &middot; cluster ${c.community_id}</div>
+      ${sig ? `<div class="pc-sig"><div class="pc-sig-h">Signature films</div><ol class="pc-sig-list">${sig}</ol></div>` : ''}
+      <div class="pc-terms">${(c.terms||[]).map(t => `<span class="pc-term">${t.term}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+  renderClusterSentiment();
+}
+
+function renderClusterSentiment(){
+  // Option D — a separate strip below the per-community panel showing
+  // audience vs critic sentiment for each cluster, plus median per-year
+  // percentile so the reader can see "loved vs successful" at a glance.
+  const host = document.getElementById('pc-sentiment-grid');
+  if(!host) return;
+  const data = (D && D.per_community_tfidf) || [];
+  if(!data.length){ host.innerHTML = ''; return; }
+  const sentMin = -1, sentMax = 1;
+  const barPx = v => Math.max(2, Math.round(((v - sentMin) / (sentMax - sentMin)) * 180));
+  host.innerHTML = data.map(c => {
+    const s = c.sentiment || {};
+    const a = s.audience_compound, k = s.critic_compound;
+    const pa = a != null ? barPx(a) : 0, pk = k != null ? barPx(k) : 0;
+    const ax = a != null ? (a >= 0 ? '+' : '') + a.toFixed(2) : '—';
+    const kx = k != null ? (k >= 0 ? '+' : '') + k.toFixed(2) : '—';
+    const pct = s.median_pct_year != null ? s.median_pct_year.toFixed(0) : '—';
+    return `
+    <div class="cs-row">
+      <div class="cs-label">
+        <div class="cs-name">${c.label || ('Community ' + c.community_id)}</div>
+        <div class="cs-meta">${c.n_films} films · cluster ${c.community_id}</div>
+      </div>
+      <div class="cs-bars">
+        <div class="cs-bar">
+          <span class="cs-key aud">audience</span>
+          <span class="cs-track"><i class="cs-fill aud" style="width:${pa}px"></i></span>
+          <span class="cs-val">${ax}</span>
+        </div>
+        <div class="cs-bar">
+          <span class="cs-key cri">critic</span>
+          <span class="cs-track"><i class="cs-fill cri" style="width:${pk}px"></i></span>
+          <span class="cs-val">${kx}</span>
+        </div>
+      </div>
+      <div class="cs-pct">
+        <div class="cs-pct-v">${pct}</div>
+        <div class="cs-pct-k">median per-year %ile</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function wireNotebookLinks(){
+  // The button opens the notebook. Prefer a real nbviewer URL from SITE_DATA
+  // when it has been swapped for a published one; otherwise fall back to the
+  // local file so the link always works for viewers running the site locally.
+  const PLACEHOLDER = /Vaksth\/comsocsci2026_final_project/;
+  let url = (D && D.notebook_url) || '';
+  if(!url || PLACEHOLDER.test(url)) url = 'Analysis-3.ipynb';
+  const open = document.getElementById('nb-open');
+  if(open) open.href = url;
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  // Dataset-intro stats from the network analysis (§3.2)
+  const nc = D && D.null_comparison;
+  if(nc){
+    set('ds-nodes', (nc.n_nodes || 0).toLocaleString());
+    set('ds-edges', (nc.n_edges || 0).toLocaleString());
+    set('ds-mod',   (nc.topology && nc.topology.observed_modularity != null)
+                     ? (+nc.topology.observed_modularity).toFixed(3) : '—');
+  }
+  // ds-comms = actual community count from the network (Network meta), not the
+  // count of communities shown in the per-community panel (which is capped at 5).
+  if(D.network && D.network.nodes){
+    const comms = new Set(D.network.nodes.map(n => n.community));
+    set('ds-comms', String(comms.size));
+  } else if(D.per_community_tfidf && D.per_community_tfidf.length){
+    set('ds-comms', String(D.per_community_tfidf.length) + '+');
+  }
+  // Methodology-section "metric agreement" stats
+  if(D.track_agreement_rho != null) set('cv-track-rho', 'ρ ≈ ' + (+D.track_agreement_rho).toFixed(2));
+  if(D.r_squared){
+    if(D.r_squared.A_whole_period != null) set('cv-r2-a', Math.round(D.r_squared.A_whole_period * 100) + '%');
+    if(D.r_squared.B_per_year     != null) set('cv-r2-b', Math.round(D.r_squared.B_per_year     * 100) + '%');
+  }
+}
+wireNotebookLinks();
+
+// TERMS fallback (term, score) — score=null means "no score available" (the
+// wiki-driven cells didn't run). The notebook build cell can overwrite any of
+// these sub-trees by emitting D.tfidf_terms.<base>.<track>.{hi,lo}.
+const TERMS={"reviews": {"A_whole_period": {"hi": [{"term":"spider","score":null},{"term":"franchise","score":null},{"term":"marvel","score":null},{"term":"animation","score":null},{"term":"fun","score":null},{"term":"sequel","score":null},{"term":"animated","score":null},{"term":"superhero","score":null},{"term":"effects","score":null},{"term":"mcu","score":null}], "lo": [{"term":"western","score":null},{"term":"american","score":null},{"term":"sci-fi","score":null},{"term":"based","score":null},{"term":"flick","score":null},{"term":"mexico","score":null},{"term":"drama","score":null},{"term":"documentary","score":null},{"term":"cage","score":null}]}, "B_per_year": {"hi": [{"term":"spider","score":null},{"term":"marvel","score":null},{"term":"franchise","score":null},{"term":"fun","score":null},{"term":"sequel","score":null},{"term":"animation","score":null},{"term":"action","score":null},{"term":"batman","score":null},{"term":"superhero","score":null},{"term":"mcu","score":null}], "lo": [{"term":"western","score":null},{"term":"american","score":null},{"term":"documentary","score":null},{"term":"flick","score":null},{"term":"based","score":null},{"term":"narration","score":null},{"term":"war","score":null},{"term":"sci-fi","score":null},{"term":"drama","score":null}]}}, "critical": {"A_whole_period": {"hi": [{"term":"franchise","score":null},{"term":"four","score":null},{"term":"said","score":null},{"term":"animated","score":null},{"term":"action","score":null},{"term":"spider","score":null},{"term":"sequel","score":null},{"term":"disney","score":null},{"term":"pixar","score":null},{"term":"effects","score":null}], "lo": [{"term":"worst","score":null},{"term":"surveyed","score":null},{"term":"unfavorable","score":null},{"term":"thriller","score":null},{"term":"states","score":null},{"term":"box office","score":null},{"term":"rock","score":null},{"term":"grossed","score":null},{"term":"drama","score":null}]}, "B_per_year": {"hi": [{"term":"four","score":null},{"term":"franchise","score":null},{"term":"action","score":null},{"term":"said","score":null},{"term":"animated","score":null},{"term":"pixar","score":null},{"term":"five","score":null},{"term":"marvel","score":null},{"term":"disney","score":null},{"term":"sequel","score":null}], "lo": [{"term":"unfavorable","score":null},{"term":"worst","score":null},{"term":"thriller","score":null},{"term":"states","score":null},{"term":"box office","score":null},{"term":"generally","score":null},{"term":"mixed","score":null},{"term":"website","score":null},{"term":"cage","score":null}]}}, "plot": {"A_whole_period": {"hi": [{"term":"spider","score":null},{"term":"earth","score":null},{"term":"humans","score":null},{"term":"human","score":null},{"term":"gandalf","score":null},{"term":"hiccup","score":null},{"term":"animals","score":null},{"term":"po","score":null},{"term":"ship","score":null},{"term":"venom","score":null}], "lo": [{"term":"life","score":null},{"term":"men","score":null},{"term":"american","score":null},{"term":"wife","score":null},{"term":"gun","score":null},{"term":"sex","score":null},{"term":"police","score":null},{"term":"local","score":null},{"term":"car","score":null},{"term":"women","score":null}]}, "B_per_year": {"hi": [{"term":"earth","score":null},{"term":"spider","score":null},{"term":"human","score":null},{"term":"gandalf","score":null},{"term":"animals","score":null},{"term":"hiccup","score":null},{"term":"humans","score":null},{"term":"po","score":null},{"term":"venom","score":null},{"term":"batman","score":null}], "lo": [{"term":"men","score":null},{"term":"life","score":null},{"term":"american","score":null},{"term":"wife","score":null},{"term":"gun","score":null},{"term":"detective","score":null},{"term":"car","score":null},{"term":"murder","score":null},{"term":"war","score":null},{"term":"sheriff","score":null}]}}};
+function renderTfidfList(items){
+  if(!items || !items.length) return '';
+  return items.map(it => {
+    const term = typeof it === 'string' ? it : (it.term || '');
+    const score = (typeof it === 'object' && it && it.score != null) ? (+it.score) : null;
+    const scoreStr = score == null ? '' : `<span class="sc">${Math.abs(score) >= 0.01 ? score.toFixed(3) : score.toFixed(4)}</span>`;
+    return `<span class="tfidf-row"><b>${term}</b>${scoreStr}</span>`;
+  }).join('');
+}
+function setWC(p,base,tk){
+  // Used for the Plot themes section (still a word cloud); reviews + critics
+  // are rendered via renderReviewsCriticsCompare() instead.
+  const imgH = document.getElementById('wc-'+p+'-h');
+  const imgL = document.getElementById('wc-'+p+'-l');
+  if(!imgH || !imgL) return;
+  imgH.src = IMG[`wc_${base}_${tk}_high.png`];
+  imgL.src = IMG[`wc_${base}_${tk}_low.png`];
+  const dyn = (D && D.tfidf_terms && D.tfidf_terms[base] && D.tfidf_terms[base][tk]) || null;
+  const T = dyn || TERMS[base][tk];
+  const elH = document.getElementById('t-'+p+'-h');
+  const elL = document.getElementById('t-'+p+'-l');
+  if(elH) elH.innerHTML = renderTfidfList(T.hi);
+  if(elL) elL.innerHTML = renderTfidfList(T.lo);
+}
+
+// Normalize TERMS entries (string or {term,score}) to {term, score|null}
+function _normTerms(arr){
+  return (arr || []).map(it => typeof it === 'string'
+    ? { term: it, score: null }
+    : { term: it.term || '', score: (it.score == null ? null : +it.score) });
+}
+
+function renderReviewsCriticsCompare(){
+  // Side-by-side bar chart of TF-IDF terms: audience vs critic, for high and
+  // low success on the currently active track. Overlap terms get a badge on
+  // the OPPOSITE card (audience badge on critic card and vice versa).
+  const tk = (TRACK == 'a') ? 'A_whole_period' : 'B_per_year';
+  const dyn = (D && D.tfidf_terms) || {};
+  const aud = dyn.reviews?.[tk]   || TERMS.reviews[tk];
+  const cri = dyn.critical?.[tk]  || TERMS.critical[tk];
+  const audHi = _normTerms(aud.hi);
+  const audLo = _normTerms(aud.lo);
+  const criHi = _normTerms(cri.hi);
+  const criLo = _normTerms(cri.lo);
+
+  const lc = s => (s || '').toLowerCase();
+  const audHiSet = new Set(audHi.map(x => lc(x.term)));
+  const audLoSet = new Set(audLo.map(x => lc(x.term)));
+  const criHiSet = new Set(criHi.map(x => lc(x.term)));
+  const criLoSet = new Set(criLo.map(x => lc(x.term)));
+
+  const renderCard = (items, oppositeSet) => {
+    if(!items.length) return '<div class="cs">No terms.</div>';
+    const maxScore = items.reduce((m, x) => Math.max(m, Math.abs(x.score || 0)), 0);
+    return items.map(it => {
+      const term = it.term;
+      const score = it.score;
+      const overlap = oppositeSet.has(lc(term));
+      const w = (score != null && maxScore)
+        ? Math.max(6, Math.abs(score) / maxScore * 100)
+        : 32;
+      const opacity = score != null ? 1 : 0.45;
+      const scoreEl = score != null
+        ? `<span class="sc">${Math.abs(score) >= 0.01 ? score.toFixed(3) : score.toFixed(4)}</span>`
+        : `<span class="sc empty">·</span>`;
+      const badgeEl = overlap ? `<span class="rc-badge">match</span>` : '';
+      return `<div class="rc-line">
+        <span class="rt"><b>${term}</b>${badgeEl}</span>
+        <span class="bar"><i style="width:${w}%;opacity:${opacity}"></i></span>
+        ${scoreEl}
+      </div>`;
+    }).join('');
+  };
+
+  const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
+  // Audience HIGH overlaps with critic HIGH; audience LOW with critic LOW
+  set('rc-aud-hi', renderCard(audHi, criHiSet));
+  set('rc-cri-hi', renderCard(criHi, audHiSet));
+  set('rc-aud-lo', renderCard(audLo, criLoSet));
+  set('rc-cri-lo', renderCard(criLo, audLoSet));
+}
+
+function renderSentiment(){
+  const el = document.getElementById('sentiment-bars');
+  if(!el) return;
+  const tk = (TRACK == 'a') ? 'A_whole_period' : 'B_per_year';
+  const aud = (D && D.sentiment && D.sentiment[tk]) || null;
+  const cri = (D && D.sentiment_critic && D.sentiment_critic[tk]) || null;
+  if(!aud && !cri){
+    el.innerHTML = '<div class="cs">Sentiment data not in payload. Re-run the notebook to compute it.</div>';
+    return;
+  }
+  const pos = v => Math.max(0, Math.min(100, (+v + 1) / 2 * 100));
+  const row = (cls, label, sub, stats) => `
+    <div class="sent-row">
+      <span class="lbl"><b>${label}</b>${sub}</span>
+      <div class="sent-track">
+        <span class="sent-pin ${cls}" style="left:${pos(stats.compound)}%">
+          <span class="sent-num">${stats.compound >= 0 ? '+' : ''}${(+stats.compound).toFixed(2)}</span>
+        </span>
+      </div>
+    </div>`;
+  const grp = (title, s, accent) => {
+    if(!s) return '';
+    return `<div class="sent-grp">
+      <div class="sent-grp-h" style="color:${accent}">${title}</div>` +
+      row('high', 'High',   ` top 10% &middot; n=${s.high.n}`,  s.high) +
+      row('mid',  'Middle', ` mid &middot; n=${s.mid.n}`,        s.mid)  +
+      row('low',  'Low',    ` bottom 10% &middot; n=${s.low.n}`, s.low)  +
+      `</div>`;
+  };
+  el.innerHTML =
+    grp('Audience reviews (VADER compound)', aud, '#f4b740') +
+    grp('Critic reception (VADER compound)', cri, '#46d6e0');
+}
+
+let netData=[], netSort='node_value', netDesc=true, netSizeMode='value_abs';
+let netExpanded=false;
+function sortNet(k){
+  // legacy column keys -> new keys
+  const map = {node_value: 'node_value'};
+  if(netSort == k) netDesc = !netDesc;
+  else { netSort = k; netDesc = true; }
+  drawNet();
+}
+function toggleNetTable(){
+  netExpanded = !netExpanded;
+  const btn = document.getElementById('netExpandBtn');
+  if(btn) btn.textContent = netExpanded ? 'Show fewer ▴' : 'Show more ▾';
+  drawNet();
+}
+function drawNet(){
+  document.querySelectorAll('.ntable th').forEach(th => th.classList.remove('sorted'));
+  const absMode = netSizeMode === 'value_abs';
+  // header
+  document.getElementById('th-val').textContent =
+    (absMode ? 'Adj profit $B' : 'Avg pct/film') +
+    (netSort === 'node_value' ? (netDesc ? ' ▾' : ' ▴') : '');
+  document.getElementById('th-deg').textContent =
+    'Degree' + (netSort === 'degree' ? (netDesc ? ' ▾' : ' ▴') : '');
+  // ensure each row has a unified .node_value for sort/render
+  const rows = [...netData].map(r => ({
+    ...r,
+    node_value: absMode ? (+r.value_abs || +r.node_value || 0)
+                        : (+r.value_per_year || +r.node_value || 0),
+  })).sort((a, b) => {
+    let x = a[netSort], y = b[netSort];
+    if(typeof x === 'string') return netDesc ? y.localeCompare(x) : x.localeCompare(y);
+    return netDesc ? (+y || 0) - (+x || 0) : (+x || 0) - (+y || 0);
+  });
+  // top 10 by default; "Show more" expands to 50
+  const view = rows.slice(0, netExpanded ? 50 : 10);
+  document.getElementById('netbody').innerHTML = view.map((r, i) => {
+    const nv = absMode
+      ? '$' + ((+r.node_value || 0) / 1e9).toFixed(2) + 'B'
+      : (+r.node_value || 0).toFixed(1);
+    return `<tr><td class="rk">${i+1}</td><td>${r.person}</td><td><span class="pill">${r.role || ''}</span></td><td>${r.degree || 0}</td><td>${r.film_count || 0}</td><td class="val">${nv}</td></tr>`;
+  }).join('');
+}
+
+// time-fairness SVG line chart
+// ── reusable two-series line chart (fairness charts) ──
+// charts = [{ svgId, tipId, legendId, series:[{key,label,color,values}] }]
+const TF_CHARTS = [];
+const tfShow = {};
+function tfToggle(chartIx, key){
+  const map = tfShow[chartIx] || (tfShow[chartIx] = {});
+  map[key] = !(map[key] === false ? false : true) ? true : false;
+  // toggle .off class on the legend pill
+  const el = document.querySelector(`#${TF_CHARTS[chartIx].legendId} [data-k="${key}"]`);
+  if(el) el.classList.toggle('off');
+  drawLineChart(TF_CHARTS[chartIx], chartIx);
+}
+function drawLineChart(cfg, chartIx){
+  const yrs = cfg.years;
+  const W=1000, H=340, pl=42, pr=14, pt=20, pb=34;
+  const xs = i => pl + (W-pl-pr) * i / (yrs.length - 1);
+  // visibility state for this chart
+  const vis = tfShow[chartIx] || (tfShow[chartIx] = Object.fromEntries(cfg.series.map(s=>[s.key,true])));
+  const activeSeries = cfg.series.filter(s => vis[s.key] !== false && s.values);
+  const allVals = activeSeries.flatMap(s => s.values).filter(v => v != null);
+  const mx = (allVals.length ? Math.max(...allVals) : 10) * 1.1 || 10;
+  const ys = v => H - pb - (H - pt - pb) * v / mx;
+  let s = '';
+  // grid
+  for(let g=0; g<=4; g++){
+    const y = pt + (H-pt-pb) * g / 4;
+    const val = Math.round(mx * (1 - g/4));
+    s += `<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#26262c" stroke-width="1"/>`;
+    s += `<text x="${pl-8}" y="${y+4}" fill="#6a675f" font-size="11" font-family="Space Mono" text-anchor="end">${val}</text>`;
+  }
+  // x labels every 5y
+  yrs.forEach((yr,i) => {
+    if(yr % 5 === 0) s += `<text x="${xs(i)}" y="${H-12}" fill="#6a675f" font-size="11" font-family="Space Mono" text-anchor="middle">${yr}</text>`;
+  });
+  // each series
+  cfg.series.forEach(series => {
+    if(vis[series.key] === false || !series.values) return;
+    const arr = series.values;
+    if(!arr.length) return;
+    let d = 'M' + arr.map((v,i) => `${xs(i)},${ys(v||0)}`).join(' L');
+    let dots = arr.map((v,i) => {
+      return `<circle cx="${xs(i)}" cy="${ys(v||0)}" r="3.5" fill="${series.color}" class="tfd-${chartIx}" data-y="${yrs[i]}" data-v="${v||0}" data-k="${series.key}" data-label="${series.label}"/>`;
+    }).join('');
+    s += `<path d="${d}" fill="none" stroke="${series.color}" stroke-width="2.5" stroke-linejoin="round"/>${dots}`;
+  });
+  // empty state
+  if(activeSeries.length === 0){
+    s += `<text x="${W/2}" y="${H/2}" fill="#6a675f" font-size="13" font-family="Space Mono" text-anchor="middle">no series selected</text>`;
+  }
+  document.getElementById(cfg.svgId).innerHTML = s;
+  // legend
+  if(cfg.legendId){
+    const lg = document.getElementById(cfg.legendId);
+    lg.innerHTML = cfg.series.map(sr => {
+      const off = vis[sr.key] === false ? ' off' : '';
+      return `<span data-k="${sr.key}" class="${off}" onclick="tfToggle(${chartIx},'${sr.key}')"><i style="background:${sr.color}"></i>${sr.label}</span>`;
+    }).join('');
+  }
+  // tooltips
+  const tip = document.getElementById(cfg.tipId);
+  document.querySelectorAll('.tfd-' + chartIx).forEach(c => {
+    c.addEventListener('mouseenter', () => {
+      tip.style.opacity = 1;
+      tip.innerHTML = `<b>${c.dataset.y}</b> &middot; ${c.dataset.v} films<br>${c.dataset.label}`;
+    });
+    c.addEventListener('mousemove', e => {
+      const r = c.closest('.tfchart').getBoundingClientRect();
+      tip.style.left = (e.clientX - r.left + 12) + 'px';
+      tip.style.top = (e.clientY - r.top - 6) + 'px';
+    });
+    c.addEventListener('mouseleave', () => tip.style.opacity = 0);
+  });
+}
+function drawTF(){
+  // Single consolidated fairness chart with three toggleable series.
+  const tf = D.time_fairness;
+  const adjusted = tf.whole_adjusted || tf.whole;
+  TF_CHARTS.length = 0;
+  TF_CHARTS.push({
+    svgId: 'tfsvg', tipId: 'tftip', legendId: 'tflegend-1',
+    years: tf.years,
+    series: [
+      { key:'whole_raw',      label:'Whole-period raw top 10%',      color:'#ef5e58', values: tf.whole_raw },
+      { key:'whole_adjusted', label:'Whole-period adjusted top 10%', color:'#f4b740', values: adjusted },
+      { key:'per_year',       label:'Per-year top 10%',              color:'#46d6e0', values: tf.per_year },
+    ],
+  });
+  TF_CHARTS.forEach((c, i) => drawLineChart(c, i));
+}
+
+// ── interactive network (canvas, static spring layout) ───────────
+// Renders the precomputed networkx spring_layout coordinates directly onto a
+// <canvas>. No d3-force simulation runs — node positions are stable across
+// filter changes and slider tweaks. Interactivity (hover, drag, pan, zoom) is
+// implemented on the canvas. Quadtree gives sub-millisecond hit-testing.
+const NET = {
+  canvas: null, ctx: null, dpr: 1,
+  cssW: 0, cssH: 0,
+  VW: 1200, VH: 750,          // virtual coordinate space
+  fit: { k: 1, x: 0, y: 0 },  // letterbox transform: virtual → canvas pixels
+  transform: { k: 0.85, x: 90, y: 56 }, // user pan/zoom (applied AFTER fit)
+  nodes: [], edges: [], labels: [],
+  quadtree: null, hover: null, drag: null, pan: null, pinned: null,
+  mode: 'value_abs', r: null,
+};
+let _communityListPopulated = false;
+function populateCommunityList(){
+  // Build the dropdown once from D.network.nodes. Each option = a community
+  // labelled by its biggest member (max weighted_degree), with the node count
+  // shown. Communities are sorted by size, descending.
+  if(_communityListPopulated) return;
+  const sel = document.getElementById('community-filter');
+  const net = (D && D.network) || null;
+  if(!sel || !net || !net.nodes || !net.nodes.length) return;
+  // Group nodes by community
+  const byCom = new Map();
+  for(const n of net.nodes){
+    const c = +n.community;
+    if(!byCom.has(c)) byCom.set(c, []);
+    byCom.get(c).push(n);
+  }
+  // Sort communities by size desc; pick biggest member per community
+  const palette = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffb300','#a65628','#f781bf','#999999','#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3'];
+  const rows = [...byCom.entries()]
+    .map(([c, ns]) => {
+      const lead = ns.reduce((a, b) =>
+        ((+b.weighted_degree || +b.degree || 0) > (+a.weighted_degree || +a.degree || 0) ? b : a), ns[0]);
+      return { c, size: ns.length, lead: lead.person, color: palette[c % palette.length] };
+    })
+    .sort((a, b) => b.size - a.size);
+  // Preserve the "All" option, then list top-25 by size. The long tail is
+  // mostly 1–3 person isolated pairs that aren't useful as filters.
+  while(sel.options.length > 1) sel.remove(1);
+  const TOP_N = 25;
+  for(const row of rows.slice(0, TOP_N)){
+    const opt = document.createElement('option');
+    opt.value = String(row.c);
+    opt.textContent = `${row.lead} cluster · ${row.size} ppl`;
+    sel.appendChild(opt);
+  }
+  _communityListPopulated = true;
+}
+function _ensureCanvas(){
+  if(NET.canvas) return true;
+  const c = document.getElementById('network-canvas');
+  if(!c) return false;
+  NET.canvas = c;
+  NET.ctx = c.getContext('2d');
+  c.addEventListener('mousemove',  _netOnMove);
+  c.addEventListener('mousedown',  _netOnDown);
+  window.addEventListener('mouseup', _netOnUp);
+  c.addEventListener('wheel',      _netOnWheel, { passive: false });
+  c.addEventListener('mouseleave', _netOnLeave);
+  c.addEventListener('dblclick',   _netResetView);
+  // Watch container size so the canvas resizes when the Network tab activates.
+  const ro = new ResizeObserver(() => _resizeCanvas());
+  ro.observe(c.parentElement);
+  _resizeCanvas();
+  return true;
+}
+function _resizeCanvas(){
+  if(!NET.canvas) return;
+  const wrap = NET.canvas.parentElement;
+  const dpr = NET.dpr = window.devicePixelRatio || 1;
+  const cssW = wrap.clientWidth || 0;
+  const cssH = 750;
+  if(cssW < 80){ NET.cssW = 0; return; }   // hidden tab — wait for visibility
+  NET.cssW = cssW; NET.cssH = cssH;
+  NET.canvas.style.width  = cssW + 'px';
+  NET.canvas.style.height = cssH + 'px';
+  NET.canvas.width  = Math.round(cssW * dpr);
+  NET.canvas.height = Math.round(cssH * dpr);
+  // Fit virtual (1000×620) into actual canvas with letterboxing.
+  const fitK = Math.min(cssW / NET.VW, cssH / NET.VH);
+  NET.fit = { k: fitK, x: (cssW - NET.VW * fitK) / 2, y: (cssH - NET.VH * fitK) / 2 };
+  _paintNetwork();
+}
+function toggleNetStrip(){
+  const body = document.getElementById('net-strip-body');
+  const btn  = document.getElementById('net-strip-btn');
+  if(!body || !btn) return;
+  const hidden = body.classList.toggle('hidden');
+  btn.classList.toggle('open', !hidden);
+}
+function _netFocusPerson(name){
+  if(!NET.nodes || !NET.nodes.length) return false;
+  const n = NET.nodes.find(x => x.id === name) ||
+            NET.nodes.find(x => (x.id||'').toLowerCase() === (name||'').toLowerCase());
+  if(!n) return false;
+  // Center the matched node and zoom in — k=1.4 keeps surrounding context visible.
+  const k = 1.4;
+  NET.transform = {
+    k,
+    x: (NET.VW/2) - n.px * k,
+    y: (NET.VH/2) - n.py * k,
+  };
+  NET.hover = n;
+  NET.pinned = n;
+  _paintNetwork();
+  return true;
+}
+function _netSearch(q){
+  const box = document.getElementById('net-search-results');
+  if(!box) return;
+  q = (q||'').trim().toLowerCase();
+  if(!q || !NET.nodes){ box.innerHTML=''; return; }
+  const hits = NET.nodes
+    .filter(n => (n.id||'').toLowerCase().includes(q))
+    .sort((a,b) => (b._wval||0)-(a._wval||0))
+    .slice(0,8);
+  if(!hits.length){ box.innerHTML='<div class="sr">No match in current view</div>'; return; }
+  box.innerHTML = hits.map(n =>
+    `<div class="sr" data-name="${n.id.replace(/"/g,'&quot;')}">${n.id} <span style="opacity:.5">· ${n.role}</span></div>`
+  ).join('');
+  box.querySelectorAll('.sr[data-name]').forEach(el => {
+    el.addEventListener('click', () => {
+      _netFocusPerson(el.getAttribute('data-name'));
+      const inp = document.getElementById('net-search');
+      if(inp) inp.value = el.getAttribute('data-name');
+      box.innerHTML='';
+    });
+  });
+}
+function _netResetView(){
+  NET.transform = { k: 0.85, x: 90, y: 56 };
+  _paintNetwork();
+}
+function _virtFromClient(clientX, clientY){
+  // Inverse of: ctx.translate(fit.x,fit.y) * scale(fit.k) * translate(tx,ty) * scale(tk)
+  const rect = NET.canvas.getBoundingClientRect();
+  let x = (clientX - rect.left - NET.fit.x) / NET.fit.k;
+  let y = (clientY - rect.top  - NET.fit.y) / NET.fit.k;
+  x = (x - NET.transform.x) / NET.transform.k;
+  y = (y - NET.transform.y) / NET.transform.k;
+  return { x, y };
+}
+function _findAt(clientX, clientY){
+  if(!NET.quadtree) return null;
+  const p = _virtFromClient(clientX, clientY);
+  // Generous hit radius so small nodes are easy to click; tighter when zoomed in.
+  return NET.quadtree.find(p.x, p.y, Math.max(8, 14 / NET.transform.k));
+}
+function _netOnMove(ev){
+  if(NET.drag){
+    const p = _virtFromClient(ev.clientX, ev.clientY);
+    NET.drag.node.px = p.x - NET.drag.dx;
+    NET.drag.node.py = p.y - NET.drag.dy;
+    NET.quadtree = d3.quadtree().x(d => d.px).y(d => d.py).addAll(NET.nodes);
+    _paintNetwork();
+    return;
+  }
+  if(NET.pan){
+    NET.transform.x = NET.pan.tx + (ev.clientX - NET.pan.x) / NET.fit.k;
+    NET.transform.y = NET.pan.ty + (ev.clientY - NET.pan.y) / NET.fit.k;
+    _paintNetwork();
+    return;
+  }
+  const found = _findAt(ev.clientX, ev.clientY);
+  if(found !== NET.hover){
+    NET.hover = found;
+    NET.canvas.style.cursor = found ? 'pointer' : 'grab';
+    _paintNetwork();
+  }
+  const tip = document.getElementById('network-tip');
+  if(found && tip){
+    const fmtB = v => '$' + ((+v || 0) / 1e9).toFixed(2) + 'B';
+    const wrap = NET.canvas.parentElement.getBoundingClientRect();
+    tip.style.opacity = 1;
+    tip.style.left = (ev.clientX - wrap.left + 14) + 'px';
+    tip.style.top  = (ev.clientY - wrap.top + 14) + 'px';
+    tip.innerHTML = `<b>${found.person || found.id}</b>
+      ${found.role ? found.role + ' &middot; ' : ''}community ${found.community ?? '?'}<br>
+      Films: ${found.film_count || 0} &nbsp;&middot;&nbsp; Degree: ${found.degree || 0}<br>
+      Adj profit: ${fmtB(found.value_abs)}<br>
+      Per-year avg: ${(+found.value_per_year || 0).toFixed(1)}`;
+  } else if(tip){
+    tip.style.opacity = 0;
+  }
+}
+function _netOnDown(ev){
+  const found = _findAt(ev.clientX, ev.clientY);
+  if(found){
+    const p = _virtFromClient(ev.clientX, ev.clientY);
+    NET.drag = { node: found, dx: p.x - found.px, dy: p.y - found.py };
+  } else {
+    NET.pan = { x: ev.clientX, y: ev.clientY, tx: NET.transform.x, ty: NET.transform.y };
+    NET.pinned = null;
+  }
+  if(NET.canvas) NET.canvas.classList.add('dragging');
+}
+function _netOnUp(){
+  NET.drag = null; NET.pan = null;
+  if(NET.canvas) NET.canvas.classList.remove('dragging');
+}
+function _netOnLeave(){
+  NET.hover = null;
+  const tip = document.getElementById('network-tip');
+  if(tip) tip.style.opacity = 0;
+  _paintNetwork();
+}
+function _netOnWheel(ev){
+  ev.preventDefault();
+  const factor = Math.exp(-ev.deltaY * 0.0015);
+  const newK = Math.max(0.3, Math.min(10, NET.transform.k * factor));
+  const rect = NET.canvas.getBoundingClientRect();
+  // Mouse position in fit-space (i.e. before the user transform)
+  const mx = (ev.clientX - rect.left - NET.fit.x) / NET.fit.k;
+  const my = (ev.clientY - rect.top  - NET.fit.y) / NET.fit.k;
+  NET.transform.x = mx - (mx - NET.transform.x) * (newK / NET.transform.k);
+  NET.transform.y = my - (my - NET.transform.y) * (newK / NET.transform.k);
+  NET.transform.k = newK;
+  _paintNetwork();
+}
+function _paintNetwork(){
+  if(!NET.ctx || !NET.cssW) return;
+  const ctx = NET.ctx;
+  ctx.setTransform(NET.dpr, 0, 0, NET.dpr, 0, 0);
+  ctx.clearRect(0, 0, NET.cssW, NET.cssH);
+  // Composite transform: letterbox-fit, then user pan/zoom
+  ctx.translate(NET.fit.x, NET.fit.y);
+  ctx.scale(NET.fit.k, NET.fit.k);
+  ctx.translate(NET.transform.x, NET.transform.y);
+  ctx.scale(NET.transform.k, NET.transform.k);
+
+  const invK = 1 / NET.transform.k;
+  const hover = NET.hover;
+  const hoverComm = hover ? +hover.community : null;
+  const hoverId = hover ? hover.id : null;
+
+  // Edges first, under nodes. Drawn in weight-tiered buckets so the two edge
+  // sliders (overall strength + relative strength) actually change the picture.
+  const es = NET.edgeStrength != null ? NET.edgeStrength : 1;
+  if(NET.edgeBuckets && NET.edgeBuckets.length){
+    ctx.lineCap = 'round';
+    if(hover){
+      // Single dim pass for non-touching edges across all buckets, then a
+      // bright amber highlight for edges incident to the hovered node.
+      ctx.strokeStyle = `rgba(124,124,124,${Math.max(0.02, 0.045 * es)})`;
+      ctx.lineWidth = 0.45 * invK;
+      ctx.beginPath();
+      for(const bucket of NET.edgeBuckets){
+        for(const e of bucket.edges){
+          if(e.source.id === hoverId || e.target.id === hoverId) continue;
+          ctx.moveTo(e.source.px, e.source.py); ctx.lineTo(e.target.px, e.target.py);
+        }
+      }
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(244,183,64,0.62)';
+      ctx.lineWidth = 1.2 * invK;
+      ctx.beginPath();
+      for(const bucket of NET.edgeBuckets){
+        for(const e of bucket.edges){
+          if(e.source.id !== hoverId && e.target.id !== hoverId) continue;
+          ctx.moveTo(e.source.px, e.source.py); ctx.lineTo(e.target.px, e.target.py);
+        }
+      }
+      ctx.stroke();
+    } else {
+      for(const bucket of NET.edgeBuckets){
+        if(!bucket.edges.length) continue;
+        ctx.strokeStyle = `rgba(124,124,124,${bucket.alpha})`;
+        ctx.lineWidth = bucket.width * invK;
+        ctx.beginPath();
+        for(const e of bucket.edges){
+          ctx.moveTo(e.source.px, e.source.py); ctx.lineTo(e.target.px, e.target.py);
+        }
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Nodes — community-coloured fill, thin dark stroke. When hovering, fade non-community.
+  for(const n of NET.nodes){
+    const dim = hover && n.community !== hoverComm && n.id !== hoverId;
+    ctx.beginPath();
+    ctx.arc(n.px, n.py, n.pr, 0, 6.2831853);
+    ctx.fillStyle = n.color;
+    ctx.globalAlpha = dim ? 0.18 : 0.92;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    if(!dim){
+      ctx.strokeStyle = '#555555';
+      ctx.lineWidth = 1 * invK;
+      ctx.stroke();
+    }
+  }
+
+  // Labels: above the node, centred, with a dark pill background for legibility
+  if(NET.labels.length){
+    const fs = 10 * invK;
+    ctx.font = `${fs}px "Space Mono", ui-monospace, monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    const padX = 4 * invK, padY = 2.5 * invK, r = 3 * invK;
+    for(const n of NET.labels){
+      const txt = n.person || n.id;
+      const tw = ctx.measureText(txt).width;
+      const bx = n.px - tw/2 - padX;
+      const by = n.py - n.pr - 5*invK - fs - padY;
+      const bw = tw + padX*2;
+      const bh = fs + padY*2;
+      ctx.fillStyle = 'rgba(10,10,14,0.82)';
+      if(ctx.roundRect){
+        ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, r); ctx.fill();
+      } else {
+        ctx.fillRect(bx, by, bw, bh);
+      }
+      ctx.fillStyle = '#f4f1ea';
+      ctx.fillText(txt, n.px, n.py - n.pr - 5*invK);
+    }
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+  }
+
+  // Amber ring for pinned node (persists after mouse moves away)
+  if(NET.pinned){
+    ctx.beginPath();
+    ctx.arc(NET.pinned.px, NET.pinned.py, NET.pinned.pr + 5 * invK, 0, 6.2831853);
+    ctx.strokeStyle = '#f4b740';
+    ctx.lineWidth = 1.8 * invK;
+    ctx.stroke();
+  }
+
+  // Hover ring on top
+  if(hover){
+    ctx.beginPath();
+    ctx.arc(hover.px, hover.py, hover.pr + 4 * invK, 0, 6.2831853);
+    ctx.strokeStyle = '#f4f1ea';
+    ctx.lineWidth = 1.4 * invK;
+    ctx.stroke();
+  }
+
+  ctx.setTransform(NET.dpr, 0, 0, NET.dpr, 0, 0);
+}
+function _readSlider(id, fallback){
+  const el = document.getElementById(id);
+  return el ? (+el.value || fallback) : fallback;
+}
+function _writeLabel(id, txt){
+  const el = document.getElementById(id);
+  if(el) el.textContent = txt;
+}
+function updateNodeScale(){
+  // Reads BOTH node sliders (size + relative) and repaints. Size is a uniform
+  // radius multiplier; relative size is an exponent on the scale — 1.0 = sqrt
+  // (default), <1 compresses the gap between big and small nodes, >1 stretches.
+  if(!NET.nodes || !NET.nodes.length) return;
+  const ns = _readSlider('node-scale', 1);
+  const nr = _readSlider('node-relative', 1);
+  _writeLabel('node-scale-val', ns.toFixed(1) + '×');
+  _writeLabel('node-relative-val', nr.toFixed(1) + '×');
+  const exponent = 0.5 * nr;                  // 1.0 → 0.5 (sqrt)
+  const vals = NET.nodes.map(d => Math.max(0, +d[NET.mode] || 0));
+  const r = d3.scalePow().exponent(exponent)
+    .domain([0, d3.max(vals) || 1])
+    .range([0.5 * ns, 20 * ns]);
+  NET.r = r;
+  NET.nodes.forEach(n => { n.pr = r(+n[NET.mode] || 0); });
+
+  _paintNetwork();
+}
+function _bucketEdges(){
+  // Group edges into 5 tiers by weight, with per-tier alpha + width set by
+  // the two edge sliders. Tier 0 = weakest collaborations (most transparent
+  // / thinnest), tier 4 = strongest (most visible / thickest).
+  const es = _readSlider('edge-strength', 1);
+  const er = _readSlider('edge-relative', 1);
+  _writeLabel('edge-strength-val', es.toFixed(1) + '×');
+  _writeLabel('edge-relative-val', er.toFixed(1) + '×');
+  NET.edgeStrength = es;
+  if(!NET.edges || !NET.edges.length){ NET.edgeBuckets = []; return; }
+  const TIERS = 5;
+  const wExt = d3.extent(NET.edges, e => +e.weight || 1);
+  const wScale = d3.scalePow().exponent(0.5 * er).domain(wExt).range([0, 0.999]);
+  const buckets = Array.from({length: TIERS}, () => ({edges: []}));
+  for(const e of NET.edges){
+    const t = Math.min(TIERS - 1, Math.max(0, Math.floor(wScale(+e.weight || 1) * TIERS)));
+    buckets[t].edges.push(e);
+  }
+  for(let i = 0; i < TIERS; i++){
+    const t = TIERS === 1 ? 0.5 : i / (TIERS - 1);   // 0..1
+    buckets[i].alpha = Math.min(0.95, (0.045 + 0.22 * t) * es);
+    buckets[i].width = 1.5 + 1.0 * t;               // px (before invK scaling) — netwulf link_width 2, variation 0.5
+  }
+  NET.edgeBuckets = buckets;
+}
+function updateEdgeStyle(){
+  // Just rebucket + repaint. The buckets are read inside _paintNetwork.
+  _bucketEdges();
+  _paintNetwork();
+}
+function legacyNetwork(){
+  // Build a minimal {nodes, edges, meta} from the legacy D.net_nodes_A/B
+  // + D.edges so the panel still has something to show when SITE_DATA
+  // hasn't been injected (i.e. someone is viewing the template raw).
+  const byPerson = new Map();
+  (D.net_nodes_A || []).forEach(n => byPerson.set(n.person, { ...n, id: n.person, value_abs: +n.node_value || 0, value_per_year: 0 }));
+  (D.net_nodes_B || []).forEach(n => {
+    const existing = byPerson.get(n.person) || { id: n.person, person: n.person, role: n.role, degree: n.degree, film_count: n.film_count, value_abs: 0 };
+    existing.value_per_year = +n.node_value || 0;
+    byPerson.set(n.person, existing);
+  });
+  const nodes = [...byPerson.values()].map(n => ({ community: 0, weighted_degree: n.degree || 0, ...n }));
+  const edges = (D.edges || []).map(e => ({ source: e.person_1, target: e.person_2, weight: +e.shared_movies || 1 }));
+  return { nodes, edges, meta: { nodes: nodes.length, edges: edges.length, modularity: null, min_edge_default: 2 } };
+}
+function drawInteractiveNetwork(){
+  const net = D.network || legacyNetwork();
+  populateCommunityList();
+  if(!_ensureCanvas()) return;          // canvas not in DOM yet — wait
+  const mode = document.getElementById('node-size-mode').value;
+  netSizeMode = mode;
+  NET.mode = mode;
+  const minW = +document.getElementById('edge-weight').value;
+  const labelMode = +document.getElementById('node-label-mode').value;
+  document.getElementById('edge-weight-val').textContent = minW;
+
+  if(!net.nodes || !net.nodes.length){
+    NET.nodes = []; NET.edges = []; NET.labels = []; NET.quadtree = null;
+    document.getElementById('network-meta').innerHTML =
+      'Network data not yet injected. The notebook’s final cell embeds the full 2,520-node graph.';
+    netData = [];
+    _paintNetwork();
+    drawNet();
+    return;
+  }
+
+  // Filter edges by min weight, keep nodes that still have at least one edge.
+  let edges = (net.edges || []).filter(e => +e.weight >= minW);
+  const connected = new Set();
+  edges.forEach(e => {
+    connected.add(typeof e.source === 'object' ? e.source.id : e.source);
+    connected.add(typeof e.target === 'object' ? e.target.id : e.target);
+  });
+  let nodes = net.nodes
+    .filter(n => connected.has(n.id || n.person))
+    .map(n => ({ ...n, id: n.id || n.person }));
+
+  // Optional community filter
+  const commSel = document.getElementById('community-filter');
+  const commFilter = commSel ? commSel.value : '';
+  if(commFilter !== '' && !Number.isNaN(+commFilter)){
+    const cid = +commFilter;
+    const keepIds = new Set(nodes.filter(n => +n.community === cid).map(n => n.id));
+    nodes = nodes.filter(n => keepIds.has(n.id));
+    edges = edges.filter(e => {
+      const s = typeof e.source === 'object' ? e.source.id : e.source;
+      const t = typeof e.target === 'object' ? e.target.id : e.target;
+      return keepIds.has(s) && keepIds.has(t);
+    });
+  }
+  netData = nodes;
+
+  // Live dataset stats — update header row when edge-weight or community filter changes
+  { const dsN = document.getElementById('ds-nodes');
+    const dsE = document.getElementById('ds-edges');
+    const dsMod = document.getElementById('ds-mod');
+    const defaultMinW = 2;
+    if(dsN) dsN.textContent = nodes.length.toLocaleString();
+    if(dsE) dsE.textContent = edges.length.toLocaleString();
+    if(dsMod){
+      const obsQ = (D.null_comparison && D.null_comparison.topology && D.null_comparison.topology.observed_modularity != null)
+        ? D.null_comparison.topology.observed_modularity.toFixed(3) : null;
+      dsMod.textContent = (minW === defaultMinW && commFilter === '' && obsQ) ? obsQ : '—';
+    }
+  }
+
+  if(!nodes.length){
+    NET.nodes = []; NET.edges = []; NET.labels = []; NET.quadtree = null;
+    document.getElementById('network-meta').innerHTML =
+      `<span class="hi">0</span> people &middot; minimum shared films <span class="hi">${minW}</span> filters out every collaboration. Lower the threshold to see the graph.`;
+    _paintNetwork();
+    drawNet();
+    return;
+  }
+
+  // Radii: compute sizes FIRST so the force simulation can use actual node
+  // sizes as collision radii — prevents overlap from the start.
+  const ns = _readSlider('node-scale', 1);
+  const nr = _readSlider('node-relative', 1);
+  _writeLabel('node-scale-val',    ns.toFixed(1) + '×');
+  _writeLabel('node-relative-val', nr.toFixed(1) + '×');
+  const exponent = mode === 'value_per_year' ? 1.0 * nr : 0.5 * nr;  // per-year: stronger contrast between large/small
+  // Always use career totals (full span) — year window slider removed.
+  nodes.forEach(n => { n._wval = Math.max(0, +n[mode] || 0); });
+  const vals = nodes.map(d => Math.max(0, d._wval || 0));
+  const r = d3.scalePow().exponent(exponent)
+    .domain([0, d3.max(vals) || 1])
+    .range([0.5 * ns, 20 * ns]);
+  nodes.forEach(n => {
+    const rr = r(Math.max(0, n._wval || 0));
+    n.pr = (Number.isFinite(rr) && rr > 0) ? rr : 0.1;
+  });
+
+  // Community-coloured fills (same 17-colour palette as the static PNGs)
+  const palette = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffb300','#a65628','#f781bf','#999999','#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3'];
+  nodes.forEach(n => { n.color = palette[(+n.community || 0) % palette.length]; });
+
+  // ── D3-force layout (collision radius = actual node size) ────────────
+  // Positions cached by (commFilter, minW) — slider tweaks run only the
+  // short relaxation in updateNodeScale, not this full simulation.
+  // Cache key includes mode so per-year and abs layouts are stored separately
+  // (per-year uses lower gravity, producing a different equilibrium).
+  const _posKey = commFilter + '|' + minW + '|' + mode;
+  if(NET._posCache && NET._posCache.key === _posKey && NET._posCache.map.size === nodes.length){
+    const cached = NET._posCache.map;
+    nodes.forEach(n => { const p = cached.get(n.id); if(p){ n.px = p[0]; n.py = p[1]; } });
+  } else {
+    const cx = NET.VW / 2, cy = NET.VH / 2;
+    const idMap = new Map(nodes.map(n => [n.id, n]));
+    const simEdges = [];
+    for(const e of edges){
+      const s = typeof e.source === 'object' ? e.source.id : e.source;
+      const t = typeof e.target === 'object' ? e.target.id : e.target;
+      const sn = idMap.get(s), tn = idMap.get(t);
+      if(sn && tn) simEdges.push({ source: sn, target: tn, weight: +e.weight || 1 });
+    }
+    // Seeded pseudo-random spread (Mulberry32) — avoids the border-ring artifact
+    // that a circle seed produces when 2500+ nodes have sub-pixel spacing.
+    let _s = 42;
+    const _rnd = () => { _s |= 0; _s = _s + 0x6D2B79F5 | 0; let t = Math.imul(_s ^ _s >>> 15, 1 | _s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const pad = 80;
+    nodes.forEach(n => { n.x = pad + _rnd() * (NET.VW - 2*pad); n.y = pad + _rnd() * (NET.VH - 2*pad); });
+    const ticks = nodes.length > 1500 ? 200 : nodes.length > 500 ? 300 : 400;
+    const gravity = mode === 'value_per_year' ? 0.06 : 0.1;
+    const charge = mode === 'value_per_year' ? -55 : -30;
+    const sim = d3.forceSimulation(nodes)
+      .force('charge', d3.forceManyBody().strength(charge))
+      .force('link', d3.forceLink(simEdges).id(d => d.id).distance(5).strength(0.4))
+      .force('x', d3.forceX(cx).strength(gravity))
+      .force('y', d3.forceY(cy).strength(gravity))
+      .force('collide', d3.forceCollide().radius(d => d.pr + 2).strength(1.0))
+      .stop();
+    for(let i = 0; i < ticks; i++) sim.tick();
+    nodes.forEach(n => {
+      n.px = Number.isFinite(n.x) ? n.x : cx;
+      n.py = Number.isFinite(n.y) ? n.y : cy;
+    });
+    NET._posCache = { key: _posKey, map: new Map(nodes.map(n => [n.id, [n.px, n.py]])) };
+  }
+
+  // Resolve edge endpoints to node objects (so paint can read .px / .py)
+  const byId = new Map(nodes.map(n => [n.id, n]));
+  const resolvedEdges = [];
+  for(const e of edges){
+    const s = byId.get(typeof e.source === 'object' ? e.source.id : e.source);
+    const t = byId.get(typeof e.target === 'object' ? e.target.id : e.target);
+    if(s && t) resolvedEdges.push({ source: s, target: t, weight: +e.weight || 1 });
+  }
+
+  // Top-N labels
+  const labels = labelMode > 0
+    ? [...nodes].sort((a, b) => (+b[mode] || 0) - (+a[mode] || 0)).slice(0, labelMode)
+    : [];
+
+  // Quadtree for hover hit-testing (sub-ms over 2,520 nodes)
+  const qt = d3.quadtree().x(d => d.px).y(d => d.py).addAll(nodes);
+
+  NET.nodes = nodes;
+  NET.edges = resolvedEdges;
+  NET.labels = labels;
+  NET.quadtree = qt;
+  NET.r = r;
+  NET.mode = mode;
+
+  _bucketEdges();   // initial edge tiers using current slider values
+
+  // Meta caption
+  const meta = net.meta || {};
+  const MODE_LABELS = {
+    'value_abs':              'absolute adjusted profit',
+    'value_per_year':         'per-year percentile (average per film)',
+    'degree':                 'degree centrality (# collaborators)',
+    'centrality_betweenness': 'betweenness centrality (bridges between clusters)',
+    'centrality_closeness':   'closeness centrality (reach across the graph)',
+    'centrality_eigenvector': 'eigenvector centrality (dense core)',
+  };
+  const modeName = MODE_LABELS[mode] || mode;
+  const commLabel = (commFilter !== '' && commSel && commSel.selectedOptions[0])
+    ? commSel.selectedOptions[0].textContent : null;
+  document.getElementById('network-meta').innerHTML =
+    `<span class="hi">${nodes.length.toLocaleString()}</span> people &middot; ` +
+    `<span class="hi">${resolvedEdges.length.toLocaleString()}</span> collaborations &middot; ` +
+    (commLabel ? `filtered to <span class="hi">${commLabel}</span> &middot; ` : '') +
+    `minimum shared films <span class="hi">${minW}</span> &middot; ` +
+    `node size = <span class="hi">${modeName}</span>` +
+    (meta.modularity != null && !commLabel ? ` &middot; community modularity ${(+meta.modularity).toFixed(3)}` : '');
+
+  drawNet();
+  _paintNetwork();
+}
+
+// Wire interactive controls
+addEventListener('DOMContentLoaded', () => {
+  const sizeSel = document.getElementById('node-size-mode');
+  if(sizeSel){
+    sizeSel.addEventListener('change', () => { sizeSel.dataset.userTouched = '1'; drawInteractiveNetwork(); });
+  }
+  const ew = document.getElementById('edge-weight');
+  if(ew){
+    ew.addEventListener('input', () => { document.getElementById('edge-weight-val').textContent = ew.value; });
+    ew.addEventListener('change', drawInteractiveNetwork);
+  }
+  const lbl = document.getElementById('node-label-mode');
+  if(lbl){ lbl.addEventListener('change', drawInteractiveNetwork); }
+  const commSel = document.getElementById('community-filter');
+  if(commSel){ commSel.addEventListener('change', drawInteractiveNetwork); }
+  const nsearch = document.getElementById('net-search');
+  if(nsearch){
+    nsearch.addEventListener('input', e => _netSearch(e.target.value));
+    nsearch.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        const first = document.querySelector('#net-search-results .sr[data-name]');
+        if(first){ _netFocusPerson(first.getAttribute('data-name')); document.getElementById('net-search-results').innerHTML=''; }
+      }
+    });
+  }
+  const sc = document.getElementById('node-scale');
+  if(sc) sc.addEventListener('input', updateNodeScale);
+  const nr = document.getElementById('node-relative');
+  if(nr) nr.addEventListener('input', updateNodeScale);
+  const esEl = document.getElementById('edge-strength');
+  if(esEl) esEl.addEventListener('input', updateEdgeStyle);
+  const erEl = document.getElementById('edge-relative');
+  if(erEl) erEl.addEventListener('input', updateEdgeStyle);
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      NET.pinned = null;
+      const inp = document.getElementById('net-search');
+      if(inp){ inp.value = ''; }
+      const box = document.getElementById('net-search-results');
+      if(box) box.innerHTML = '';
+      _paintNetwork();
+    }
+  });
+});
+
+function fillBars(){document.querySelectorAll('.bfill').forEach((f,i)=>{
+  if(!f.dataset.done){setTimeout(()=>f.style.width=f.dataset.w+'%',i*40);}});}
+
+// reveal + progress
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(Math.min(i%4,3)*.06)+'s';io.observe(el);});
+addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
+
+// ── Tab navigation (hash-routed) ───────────────────────────────────
+const TAB_NAMES = ['hero','methodology','attributes','network','text','recipe','discussion','notebook'];
+const TAB_HOOKS = {
+  // Called every time a tab activates. Charts re-run so they fit the now-visible viewport.
+  methodology: () => { try{ drawTF(); }catch(e){} },
+  attributes:  () => { try{ fillBars(); }catch(e){} },
+  network:     () => { try{ drawInteractiveNetwork(); renderNullComparison(); renderCentralityTable(); }catch(e){} },
+  text:        () => { try{ renderPerCommunity(); }catch(e){} },
+  discussion:  () => { try{ fillBars(); }catch(e){} },
+  notebook:    () => { try{ wireNotebookLinks(); }catch(e){} },
+};
+function setActiveTab(name, opts){
+  opts = opts || {};
+if(SITE_DATA){
+  D.network = SITE_DATA.network || null;
+  if(SITE_DATA.time_fairness){
+    D.time_fairness.whole_raw = SITE_DATA.time_fairness.whole_raw || null;
+    D.time_fairness.whole_adjusted = SITE_DATA.time_fairness.whole_adjusted || D.time_fairness.whole;
+    if(SITE_DATA.time_fairness.years) D.time_fairness.years = SITE_DATA.time_fairness.years;
+    if(SITE_DATA.time_fairness.per_year) D.time_fairness.per_year = SITE_DATA.time_fairness.per_year;
+  }
+  if(SITE_DATA.tfidf_terms) D.tfidf_terms = SITE_DATA.tfidf_terms;
+  if(SITE_DATA.sentiment) D.sentiment = SITE_DATA.sentiment;
+  if(SITE_DATA.sentiment_critic) D.sentiment_critic = SITE_DATA.sentiment_critic;
+  if(SITE_DATA.null_comparison) D.null_comparison = SITE_DATA.null_comparison;
+  if(SITE_DATA.per_community_tfidf) D.per_community_tfidf = SITE_DATA.per_community_tfidf;
+  if(SITE_DATA.notebook_url) D.notebook_url = SITE_DATA.notebook_url;
+  // Attributes / Recipe data — these used to be hard-coded in const D above;
+  // they are now reproduced by the notebook (§3.10) and overwrite the
+  // static placeholders so every number on the site has producing code.
+  if(SITE_DATA.corr){
+    const renameKey = arr => arr.map(r => ({"Unnamed: 0": r.feature, "spearman": r.spearman}));
+    if(SITE_DATA.corr.A_whole_period) D.corr_A = renameKey(SITE_DATA.corr.A_whole_period);
+    if(SITE_DATA.corr.B_per_year)     D.corr_B = renameKey(SITE_DATA.corr.B_per_year);
+  }
+  if(SITE_DATA.genre){
+    if(SITE_DATA.genre.A_whole_period) D.genre_A = SITE_DATA.genre.A_whole_period;
+    if(SITE_DATA.genre.B_per_year)     D.genre_B = SITE_DATA.genre.B_per_year;
+  }
+  if(SITE_DATA.budget){
+    if(SITE_DATA.budget.A_whole_period) D.budget_A = SITE_DATA.budget.A_whole_period;
+    if(SITE_DATA.budget.B_per_year)     D.budget_B = SITE_DATA.budget.B_per_year;
+  }
+  if(SITE_DATA.r_squared) D.r_squared = SITE_DATA.r_squared;
+  if(SITE_DATA.vc_rho)    D.vc_rho    = SITE_DATA.vc_rho;
+  if(SITE_DATA.va_rho)    D.va_rho    = SITE_DATA.va_rho;
+  if(SITE_DATA.track_agreement_rho != null) D.track_agreement_rho = SITE_DATA.track_agreement_rho;
+}
+// keep backward-compat alias
+D.time_fairness.whole_adjusted = D.time_fairness.whole_adjusted || D.time_fairness.whole;
+
+let TRACK='a';
+
+function setTrack(t){
+  TRACK=t;
+  document.body.className='track-'+t;
+  document.getElementById('ta').className=t=='a'?'on':'';
+  document.getElementById('tb').className=t=='b'?'on b':'';
+  render();
+}
+
+function render(){
+  const A=TRACK=='a';
+  // stats — from notebook §3.10, fall back to placeholders if SITE_DATA absent
+  const trk = A ? 'A_whole_period' : 'B_per_year';
+  const r2 = (D.r_squared && D.r_squared[trk] != null) ? (D.r_squared[trk] * 100).toFixed(0) + '%' : (A ? '59%' : '38%');
+  const vc = (D.vc_rho && D.vc_rho[trk] != null) ? (+D.vc_rho[trk]).toFixed(2) : (A ? '0.70' : '0.67');
+  const va = (D.va_rho && D.va_rho[trk] != null) ? ((+D.va_rho[trk] >= 0 ? '+' : '') + (+D.va_rho[trk]).toFixed(2)) : (A ? '+.01' : '+.15');
+  document.getElementById('s-r2').textContent = r2;
+  document.getElementById('s-vc').textContent = vc;
+  document.getElementById('s-va').textContent = va;
+  // The legacy "negligible / now matters" reading needs to flip with the sign too.
+  const vaNum = (D.va_rho && D.va_rho[trk] != null) ? +D.va_rho[trk] : (A ? 0.01 : 0.15);
+  document.getElementById('s-val').textContent =
+    Math.abs(vaNum) < 0.05 ? '(negligible)'
+    : (vaNum > 0.20 ? '(matters · positive)' : '(modest, positive)');
+  // corr bars
+  const corr=A?D.corr_A:D.corr_B;
+  const ck=Object.keys(corr[0]);
+  const cbox=document.getElementById('corrbars');
+  document.getElementById('corr-track').textContent=A?'Track A · inflation-adjusted profit':'Track B · per-year percentile';
+  const cmax=Math.max(...corr.map(r=>+r.spearman));
+  cbox.innerHTML=corr.sort((a,b)=>b.spearman-a.spearman).map((r,i)=>{
+    const nm=r[ck[0]].replace('_adj_2026','').replace('_',' ');
+    const v=+r.spearman;
+    return `<div class="row"><div class="lbl">${nm}</div><div class="btrack"><div class="bfill" data-w="${(v/0.8*100).toFixed(1)}" style="background:${i==0?'linear-gradient(90deg,#46d6e0,#5fcf80)':'#3c5860'}"></div></div><div class="bx">ρ ${v.toFixed(2)}</div></div>`;
+  }).join('');
+  // genre bars
+  const gen=A?D.genre_A:D.genre_B;
+  const gk=A?'median_adj_profit_M':'median_pct_year';
+  document.getElementById('genre-h').textContent='Genre ranking';
+  document.getElementById('genre-cs').textContent=A?'Median inflation-adjusted profit ($M) · genres with ≥20 films':'Median per-year percentile (50 = average) · genres with ≥20 films';
+  const gsorted=gen.filter(r=>r.n>=20).sort((a,b)=>b[gk]-a[gk]).slice(0,10);
+  const gmax=Math.max(...gsorted.map(r=>+r[gk]));
+  document.getElementById('genrebars').innerHTML=gsorted.map((r,i)=>{
+    const v=+r[gk];const hot=i<5;
+    const sec=A?('$'+v.toFixed(0)+'M'):(v.toFixed(1));
+    const p2=A?(r.pct_profitable?(+r.pct_profitable).toFixed(0)+'% profit':''):((+r.pct_above_median).toFixed(0)+'% beat yr');
+    return `<div class="row"><div class="lbl">${r.genre}</div><div class="btrack"><div class="bfill" data-w="${(v/gmax*100).toFixed(1)}" style="background:${hot?'linear-gradient(90deg,#46d6e0,#5fcf80)':'#3c5860'}"><span class="bval">${sec}</span></div></div><div class="bx">${p2}</div></div>`;
+  }).join('');
+  // budget trio
+  const bud=A?D.budget_A:D.budget_B;
+  const lo=bud[0],mid=bud[2],hi=bud[4];
+  let trio;
+  if(A){
+    trio=[['g','Go small','Q1 · ≈$7M',(+lo.med_ROI).toFixed(2)+'×','median ROI','Highest return per dollar — horror, comedy, indie.'],
+    ['r','The valley','Q3 · ≈$43M',(+mid.med_ROI).toFixed(2)+'×','median ROI','Worst ROI tier — too big to be lean, too small to be spectacle.'],
+    ['c','Go huge','Q5 · ≈$175M',(+hi.med_ROI).toFixed(2)+'×','median ROI','85% profitable — blockbuster scale insulates.']];
+  }else{
+    trio=[['r','Go small','Q1 · ≈$7M',(+lo.med_pct_year).toFixed(0),'percentile','Cheap films rank low for their year — median 36th pct.'],
+    ['c','Mid','Q3 · ≈$43M',(+mid.med_pct_year).toFixed(0),'percentile','Middling spend, middling rank.'],
+    ['g','Go huge','Q5 · ≈$175M',(+hi.med_pct_year).toFixed(0),'percentile','85th percentile — scale almost guarantees beating your year.']];
+  }
+  document.getElementById('budgettrio').innerHTML=trio.map(c=>
+    `<div class="card ${c[0]}"><div class="bar"></div><h3>${c[1]}</h3><div class="lab">${c[2]}</div><div class="big">${c[3]}</div><div class="rl">${c[4]}</div><p>${c[5]}</p></div>`).join('');
+  // network: track toggle now nudges the network's node-size mode
+  // (the explicit selector below still wins if the user touches it).
+  const sizeSel = document.getElementById('node-size-mode');
+  if(sizeSel && !sizeSel.dataset.userTouched){
+    sizeSel.value = A ? 'value_abs' : 'value_per_year';
+  }
+  drawInteractiveNetwork();
+  // word clouds
+  const tk=A?'A_whole_period':'B_per_year';
+  // Plot themes still uses the word-cloud layout; reviews + critics now live
+  // in the side-by-side comparison block driven by renderReviewsCriticsCompare.
+  setWC('plt','plot',tk);
+  renderReviewsCriticsCompare();
+  renderSentiment();
+  renderNullComparison();
+  renderCentralityTable();
+  renderPerCommunity();
+  // re-trigger bar fills
+  setTimeout(fillBars,50);
+}
+
+function renderNullComparison(){
+  const scoreRow = document.getElementById('null-score-row');
+  const barCard  = document.getElementById('null-bar-card');
+  const read     = document.getElementById('null-read');
+  const aGrid    = document.getElementById('null-attr-grid');
+  const aRead    = document.getElementById('null-attr-read');
+  const aTitle   = document.getElementById('null-attr-title');
+  const aCs      = document.getElementById('null-attr-cs');
+  if(!scoreRow) return;
+  const d = D && D.null_comparison;
+  if(!d){
+    scoreRow.innerHTML = '<div class="null-read">Run the notebook to populate null-model comparison.</div>';
+    if(barCard) barCard.innerHTML = '';
+    if(aGrid)   aGrid.innerHTML   = '';
+    return;
+  }
+  const t       = d.topology || {};
+  const cfgMod  = t.config_modularity_native || t.config_modularity || {mean:0,std:0};
+  const erMod   = t.er_modularity_native     || t.er_modularity     || {mean:0,std:0};
+  const cfgClus = t.config_clustering  || {mean:0,std:0};
+  const erClus  = t.er_clustering      || {mean:0,std:0};
+  const obsMod  = +t.observed_modularity  || 0;
+  const obsClus = +t.observed_clustering  || 0;
+  const clusteringRatio = cfgClus.mean > 0 ? Math.round(obsClus / cfgClus.mean) : '—';
+
+  scoreRow.innerHTML = `
+    <div class="null-score-item">
+      <div class="nsi-n">${obsMod.toFixed(3)}</div>
+      <div class="nsi-lbl">Observed modularity</div>
+      <div class="nsi-ctx">Ranges 0 → 1. <b>Far above both null models</b> — community structure cannot be explained by degree distribution alone.</div>
+    </div>
+    <div class="null-score-item">
+      <div class="nsi-n">${obsClus.toFixed(3)}</div>
+      <div class="nsi-lbl">Observed clustering coefficient</div>
+      <div class="nsi-ctx">Fraction of a person's collaborators who also worked with each other. <b>~${clusteringRatio}× above the degree-preserving null</b> — people form tight, recurring creative circles.</div>
+    </div>`;
+
+  function barRow(lbl, sub, pct, dotColor, valStr, valColor){
+    const p = Math.min(99.5, Math.max(0.5, pct));
+    return `
+      <div class="null-bar-row-wrap">
+        <div class="null-bar-lbl">${lbl}${sub ? `<small>${sub}</small>` : ''}</div>
+        <div class="null-bar-track">
+          <div class="null-bar-fill" style="width:${p}%;background:${dotColor}22"></div>
+          <div class="null-bar-dot" style="left:${p}%;background:${dotColor}"></div>
+        </div>
+        <div class="null-bar-val" style="color:${valColor}">${valStr}</div>
+      </div>`;
+  }
+
+  if(barCard){
+    const p = v => Math.min(99.5, Math.max(0.5, v * 100));
+    barCard.innerHTML = `
+      <div class="null-bar-card-title">Observed vs two random null models &middot; ${d.realizations||100} realisations each &middot; scale 0 → 1</div>
+      <div class="null-bar-metric">
+        <div class="null-bar-metric-name">Modularity</div>
+        ${barRow('Observed network','',p(obsMod),'#5fcf80',obsMod.toFixed(3),'#5fcf80')}
+        ${barRow('Configuration null','degree-preserving',p(cfgMod.mean),'#8a8880','~'+cfgMod.mean.toFixed(2),'#9a978f')}
+        ${barRow('Erdős–Rényi null','totals only',p(erMod.mean),'#5a5855','~'+erMod.mean.toFixed(2),'#6a6865')}
+        <div class="null-bar-interp"><b>Why two tests?</b> The configuration null proves communities are not a side-effect of degree distribution. ER proves they are not a density artefact. Both fail to reproduce our ${obsMod.toFixed(2)} — the clusters are real under the strongest possible baseline.</div>
+      </div>
+      <div class="null-bar-block-divider"></div>
+      <div class="null-bar-metric">
+        <div class="null-bar-metric-name">Clustering coefficient</div>
+        ${barRow('Observed network','',p(obsClus),'#5fcf80',obsClus.toFixed(3),'#5fcf80')}
+        ${barRow('Configuration null','degree-preserving',p(cfgClus.mean),'#8a8880','~'+cfgClus.mean.toFixed(3),'#9a978f')}
+        ${barRow('Erdős–Rényi null','totals only',p(erClus.mean),'#5a5855','~'+erClus.mean.toFixed(3),'#6a6865')}
+        <div class="null-bar-interp">The clustering coefficient measures how often two of a person's collaborators have also worked with each other directly. Our observed value (${obsClus.toFixed(3)}) is <b>~${clusteringRatio}× higher</b> than the degree-preserving null (~${cfgClus.mean.toFixed(3)}): local triangles form far more often than degree distribution alone would predict — the same people repeatedly reconvene across projects.</div>
+      </div>`;
+  }
+  if(read) read.innerHTML = '';
+
+  if(aGrid && d.attribute_assortativity){
+    const tkA = 'A_whole_period', tkB = 'B_per_year';
+    const dA = d.attribute_assortativity[tkA];
+    const dB = d.attribute_assortativity[tkB];
+    const tlabelA = 'inflation-adjusted profit', tlabelB = 'per-year percentile';
+    if(aTitle) aTitle.textContent = 'Do successful people cluster together?';
+    if(aCs)    aCs.textContent    = 'Newman attribute assortativity: are high-success people more likely to collaborate with other high-success people than chance predicts? Tested against 200 label-shuffle runs on the active track.';
+
+    function assortCard(data, trackClass, trackLabel, isActive){
+      if(!data) return `<div class="null-assort-card"><div class="nac-track ${trackClass}">${trackLabel}</div><div class="nac-lbl">No data</div></div>`;
+      const obs  = +data.observed;
+      const sign = obs >= 0 ? '+' : '';
+      const p    = +data.p_two;
+      const sigW = p < 0.005 ? 'far outside' : p < 0.05 ? 'outside' : 'inside';
+      const opacity = isActive ? '' : ' style="opacity:.5"';
+      return `
+        <div class="null-assort-card"${opacity}>
+          <div class="nac-track ${trackClass}">${trackLabel}${isActive ? ' &middot; active' : ''}</div>
+          <div class="nac-n">${sign}${obs.toFixed(3)}</div>
+          <div class="nac-lbl">Newman attribute assortativity</div>
+          <div class="nac-sub">Null: <b>${(+data.null_mean).toFixed(3)} &plusmn; ${(+data.null_std).toFixed(3)}</b> &middot; p = ${p.toFixed(3)} &middot; 200 shuffles<br><br>${isActive ? (sigW.charAt(0).toUpperCase()+sigW.slice(1))+' the null distribution — high-success people connect to other high-success people more than chance predicts.' : 'Switch tracks above to activate.'}</div>
+        </div>`;
+    }
+
+    const activeIsA = TRACK === 'a';
+    aGrid.innerHTML = assortCard(dA,'a','Track A &middot; '+tlabelA, activeIsA)
+                    + assortCard(dB,'b','Track B &middot; '+tlabelB,!activeIsA);
+
+    if(aRead){
+      const active = activeIsA ? dA : dB;
+      if(active){
+        aRead.style.display = 'block';
+        aRead.innerHTML = `The signal holds under both success definitions — ruling out inflation and year-era effects as explanations. Collaborative circles don't just share a genre; <b>they share a success level.</b> Who you work with predicts where you end up in the distribution.`;
+      } else {
+        aRead.style.display = 'none';
+      }
+    }
+  } else if(aGrid){
+    aGrid.innerHTML = '<div class="null-read">Attribute assortativity unavailable.</div>';
+  }
+}
+
+function renderCentralityTable(){
+  const grid = document.getElementById('cent-grid');
+  if(!grid) return;
+  const top = (D && D.network && D.network.centrality_top5) || null;
+  if(!top){
+    grid.innerHTML = '<div class="cent-card"><div class="cc-def">Run the notebook to populate centrality.</div></div>';
+    return;
+  }
+  const COLS = [
+    { key:'betweenness', label:'Betweenness',
+      def:'How often this person sits on the shortest path between two others — <b>brokerage power</b> between clusters. High betweenness does not imply high success.',
+      note:'Cross-genre connectors — actors or directors who bridge separate clusters.' },
+    { key:'closeness', label:'Closeness',
+      def:'How quickly this person can reach everyone else on average — <b>industry-wide accessibility</b> across the whole network.',
+      note:'Prolific performers who span multiple genres — never far from anyone in the network.' },
+    { key:'eigenvector', label:'Eigenvector',
+      def:'Connected to others who are themselves well-connected — <b>core membership</b> in the densest part of the graph. Quality of connections, not just quantity.',
+      note:'The inner ring of the collaboration economy — franchise regulars who appear alongside other franchise regulars.' },
+  ];
+  grid.innerHTML = COLS.map(col => {
+    const rows = (top[col.key] || []).slice(0,5);
+    const people = rows.map((r,i) =>
+      `<div class="cc-person${i===rows.length-1?' last':''}"><span class="cc-rk">${i+1}.</span>${r ? r.person : '&mdash;'}</div>`
+    ).join('');
+    return `<div class="cent-card"><div class="cc-name">${col.label}</div><div class="cc-def">${col.def}</div>${people}<div class="cc-note">${col.note}</div></div>`;
+  }).join('');
 }
 
 function renderPerCommunity(){

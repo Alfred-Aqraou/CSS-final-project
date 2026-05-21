@@ -568,7 +568,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
         <div class="attr-chips">
           <code>top_cast</code><span class="grp">(first 10)</span><code>directors</code>
         </div>
-        <p class="uses">Every node and edge of the collaboration graph. Each film links its top-10 cast plus its directors pairwise; pairs that share at least two films become weighted edges. Used for community detection, centrality, and the track-aware attribute assortativity test against a label-shuffle null.</p>
+        <p class="uses">The people columns from TMDb. <code>top_cast</code> lists the first 10 credited actors per film; <code>directors</code> lists all credited directors. Together they record who worked on each film and are the basis for the collaboration analysis in the Network tab.</p>
       </div>
 
       <div class="attr-card c">
@@ -633,15 +633,15 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="stats reveal">
     <div class="c1">
       <div class="n" id="s-r2">59%</div>
-      <p>of success variance explained by just four numeric attributes (popularity, budget, rating, runtime). This is the fit, not the recipe</p>
+      <p>of success variance explained by just four numeric attributes. A high fit means these attributes are correlated with success, not that they cause it.</p>
     </div>
     <div class="c2">
       <div class="n" id="s-vc">0.70</div>
-      <p>Spearman ρ for the top correlate, <span id="s-vcl">audience vote count</span>, a proxy for how much a film is being talked about</p>
+      <p>Spearman ρ for the top correlate, <span id="s-vcl">audience vote count</span>. Popularity signals that audiences are already engaged, which amplifies revenue regardless of quality.</p>
     </div>
     <div class="c3">
       <div class="n" id="s-va">+.01</div>
-      <p>standardised β for critical rating <span id="s-val"></span>. Near-zero under Track A, materially positive under Track B: quality matters more once scale is controlled for</p>
+      <p>standardised β for critical rating <span id="s-val"></span>. This near-zero value under Track A shows that critical quality barely moves the needle on raw revenue; it rises under Track B once year-effects are removed.</p>
     </div>
   </div>
 
@@ -651,6 +651,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="cs">Spearman ρ between each numeric feature and the active success metric (<span id="corr-track">Track A · inflation-adjusted profit</span>). Range −1 (perfect inverse) to +1 (perfect agreement); zero = no monotonic relationship.</div>
     <div class="bars" id="corrbars"></div>
   </div>
+  <p class="body-lg reveal" style="margin-top:28px">The ranking shifts when you switch tracks. Under absolute profit, audience reach dominates because blockbusters that open wide accumulate revenue regardless of when they were released. Under per-year percentile, critical rating gains ground: once a film is judged only against its own year, quality becomes a more reliable separator. Budget and runtime remain secondary under both definitions.</p>
 </div></section>
 
 <section><div class="wrap">

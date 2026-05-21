@@ -391,6 +391,57 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   font-size:13px;color:#9a978f;font-family:'Space Mono',monospace;line-height:1.55}
 .ds-cols b{color:#f4f1ea;font-weight:700}
 
+/* Sub-section headers inside .ds-block */
+.ds-sub-h{display:flex;align-items:baseline;gap:14px;margin:30px 0 14px;
+  padding-top:24px;border-top:1px solid #1c1c22}
+.ds-sub-h:first-of-type{padding-top:0;border-top:0;margin-top:22px}
+.ds-sub-h .num{font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.ds-sub-h h4{margin:0;font-family:var(--serif);font-size:18px;color:var(--ink);
+  font-weight:500;letter-spacing:.005em}
+.ds-sub-lede{margin:0 0 14px;color:var(--mute);font-size:13px;line-height:1.65;max-width:780px}
+
+/* Attribute lens cards (Intro → About-the-dataset → schema sub-section) */
+.attr-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.attr-card{position:relative;padding:18px 22px 20px 26px;background:#0e0e12;
+  border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.attr-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.attr-card.a::before{background:var(--amber)}
+.attr-card.b::before{background:var(--cyan)}
+.attr-card.c::before{background:var(--green)}
+.attr-card.d::before{background:#b07cf5}
+.attr-card .lens-tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.attr-card h5{margin:0 0 12px;font-family:var(--serif);font-size:16px;color:var(--ink);
+  font-weight:500;letter-spacing:.005em}
+.attr-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px;align-items:center}
+.attr-chips code{font-family:var(--mono);font-size:10.5px;color:var(--cyan);
+  background:#16161a;border:1px solid var(--line);padding:3px 7px;border-radius:4px;
+  letter-spacing:-.01em;white-space:nowrap}
+.attr-chips .grp{font-family:var(--mono);font-size:10px;color:var(--dim);
+  letter-spacing:.04em;padding:0 2px;white-space:nowrap}
+.attr-card .uses{margin:0;color:var(--mute);font-size:12.5px;line-height:1.65}
+.attr-card .uses code{font-family:var(--mono);font-size:11px;color:var(--mute);
+  background:transparent;padding:0;border:0}
+
+.attr-foot{margin-top:14px;padding:13px 18px;background:#0e0e12;
+  border:1px dashed var(--line);border-radius:8px;color:var(--mute);font-size:11.5px;line-height:1.7}
+.attr-foot b{color:var(--ink)}
+.attr-foot code{font-family:var(--mono);font-size:10.5px;color:var(--mute);
+  background:transparent;padding:0 2px;border:0}
+
+/* Lens label inside the .rq question list */
+.rq .sub li b{color:var(--ink);font-weight:600;margin-right:4px}
+
+/* Chart-card "callout" lead-in (Methodology) */
+.chart-lead{margin:30px 0 -6px;color:var(--mute);font-size:.98rem;line-height:1.65;max-width:760px}
+.chart-lead b{color:var(--ink);font-weight:600}
+
+@media (max-width:760px){
+  .attr-list{grid-template-columns:1fr}
+  .ds-sub-h{margin:24px 0 12px;padding-top:20px}
+}
+
 /* Notebook pill in header */
 .nb-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#1c1c22;
   border:1px solid #26262c;border-radius:999px;color:#46d6e0;font-family:'Space Mono',monospace;
@@ -450,11 +501,11 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <header class="hero"><div class="wrap">
   <div class="kicker reveal">02467 Computational Social Science · Project Assignment B</div>
   <h1 class="reveal">Recipe for<br><em>high-grossing</em><br>movies</h1>
-  <p class="lede reveal">A dual-track data story: first we make box-office success <b>comparable across time</b>, then we test the same 3,781 US films through four lenses — money, genre, collaboration, language — to find <b>the patterns that survive both definitions of success</b>.</p>
+  <p class="lede reveal">Box-office success is hard to compare across decades: a 2001 release lives in a different market than a 2024 release. This project first builds a fair, year-aware measure of success, then tests 3,781 US theatrical films through four lenses — <b>attributes</b>, <b>network</b>, <b>plots</b>, <b>reviews</b> — to find the patterns that hold up under <b>both definitions of success</b>.</p>
   <div class="meta reveal">
     <span><b>3,781</b>US films · 2000–present</span>
     <span><b>2 metrics</b>absolute & per-year</span>
-    <span><b>4 lenses</b>network · reviews · plots · attributes</span>
+    <span><b>4 lenses</b>attributes · network · plots · reviews</span>
     <span><b>$2026</b>inflation-adjusted</span>
   </div>
 </div><div class="scroll-cue">Scroll ↓ · toggle tracks top-right</div></header>
@@ -465,12 +516,12 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <h2>What characteristics define <em>high-success</em> US films?</h2>
   </div>
   <div class="reveal">
-    <p class="body-lg">Following supervisor feedback we measure success two complementary ways and run every analysis on both — toggle the switch any time.</p>
+    <p class="body-lg">We measure success in <em>two</em> complementary ways and run every analysis under both, so any reported pattern has to survive both definitions. Toggle the switch top-right at any time. The four lenses below organise the rest of the site.</p>
     <ul class="sub">
-      <li><span>01</span>Which collaborations of cast & directors recur among successful films?</li>
-      <li><span>02</span>What role do budget, runtime, rating and popularity play?</li>
-      <li><span>03</span>Do successful films share plot language?</li>
-      <li><span>04</span>What review & reception patterns track success?</li>
+      <li><span>01</span><b>Attributes ·</b> What role do budget, runtime, rating and popularity play?</li>
+      <li><span>02</span><b>Network ·</b> Which collaborations of cast &amp; directors recur among successful films?</li>
+      <li><span>03</span><b>Plots ·</b> Do successful films share plot language?</li>
+      <li><span>04</span><b>Reviews ·</b> What review &amp; reception patterns track success?</li>
     </ul>
   </div>
 </div></section>
@@ -478,23 +529,68 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="ds-wrap">
   <div class="ds-block reveal">
     <h3>About the dataset</h3>
-    <div class="cs">3,781 US theatrical films released between 2000 and 2026, combining two sources we built ourselves: a TMDb-extracted table of revenue, budget, cast, directors, reviews, votes, and an inflation-corrected profit column (CPI-adjusted to 2026 dollars), joined on <code>tmdb_id</code> with Wikipedia plot summaries and critical-reception sections. The full extraction pipeline, filter choices, and inflation adjustment are documented in §2 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</div>
+    <div class="cs">3,781 US theatrical films released between 2000 and 2026. The data combines two sources we built ourselves: a TMDb extraction (revenue, budget, cast, directors, votes, audience reviews) with an inflation-corrected profit column in 2026 dollars, joined on <code>tmdb_id</code> with Wikipedia plot summaries and critical-reception sections. The full pipeline is documented in §2 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</div>
+
+    <div class="ds-sub-h"><span class="num">a · Shape</span><h4>At a glance</h4></div>
+    <p class="ds-sub-lede">The raw rowspace before any network or text derivations. Coverage gaps in the Wikipedia columns are why the Language tab treats them as a sub-sample.</p>
     <div class="ds-grid">
-      <div class="ds-stat"><div class="ds-k">Films</div><div class="ds-v" id="ds-films">3,781</div><div class="ds-sub">US theatrical · ≥ $1 M revenue</div></div>
+      <div class="ds-stat"><div class="ds-k">Films</div><div class="ds-v" id="ds-films">3,781</div><div class="ds-sub">US theatrical · ≥ $1 M revenue · budget present</div></div>
       <div class="ds-stat"><div class="ds-k">Years</div><div class="ds-v" id="ds-years">2000–2026</div><div class="ds-sub">27 years · 2026 partial (extraction date May)</div></div>
-      <div class="ds-stat"><div class="ds-k">Network nodes</div><div class="ds-v" id="ds-nodes">2,520</div><div class="ds-sub">cast + directors · edge weight ≥ 2</div></div>
-      <div class="ds-stat"><div class="ds-k">Network edges</div><div class="ds-v" id="ds-edges">7,203</div><div class="ds-sub">weighted by shared films</div></div>
-      <div class="ds-stat"><div class="ds-k">Communities</div><div class="ds-v" id="ds-comms">—</div><div class="ds-sub">Louvain</div></div>
-      <div class="ds-stat"><div class="ds-k">Wiki plot text</div><div class="ds-v">2,865</div><div class="ds-sub">76 % coverage</div></div>
-      <div class="ds-stat"><div class="ds-k">Wiki critic text</div><div class="ds-v">2,901</div><div class="ds-sub">77 % coverage</div></div>
-      <div class="ds-stat"><div class="ds-k">Modularity</div><div class="ds-v" id="ds-mod">—</div><div class="ds-sub">vs. ~0.40 in random null</div></div>
+      <div class="ds-stat"><div class="ds-k">Wiki plot text</div><div class="ds-v">2,865</div><div class="ds-sub">76 % coverage (films with a plot section)</div></div>
+      <div class="ds-stat"><div class="ds-k">Wiki critic text</div><div class="ds-v">2,901</div><div class="ds-sub">77 % coverage (films with a reception section)</div></div>
     </div>
+
+    <div class="ds-sub-h"><span class="num">b · Provenance</span><h4>How it was assembled</h4></div>
+    <p class="ds-sub-lede">Two extraction pipelines and one inflation pass, all reproducible from the notebook. Re-running is gated behind <code>RUN_API_EXTRACTION = False</code> — the cached CSVs in the repo are loaded by default.</p>
     <div class="ds-cols">
-      <div><b>Source · TMDb.</b> Revenue, budget, runtime, vote counts, audience reviews, top-cast, directors, genres, production companies. Extracted in §2.1 of the notebook via the <code>/movie/{id}</code> endpoint with <code>credits,reviews,release_dates</code> appended, 100-thread concurrent batches, 100-req/s rate-limit safety.</div>
-      <div><b>Source · Wikipedia.</b> Plot summaries and critical-reception sections retrieved via the MediaWiki API in §2.2 of the notebook. Title resolution by search + page-parse; section text isolated by regex on level-2 headings. Global rate-limit lock to stay under 150 req/min, checkpointed every 200 rows.</div>
-      <div><b>Inflation adjustment.</b> CPI from FRED series <code>CPIAUCSL</code>. <code>box_office_surplus_adj_2026 = (revenue − budget) × CPI<sub>2026</sub> / CPI<sub>release_year</sub></code>. Methodology in §2.3 of the notebook.</div>
-      <div><b>Two success metrics ("tracks").</b> Track A = absolute inflation-adjusted profit (the classic view). Track B = each film's rank within its release year (time-invariant). The site lets you switch between the two — toggle top-right.</div>
+      <div><b>Source · TMDb.</b> Revenue, budget, runtime, vote counts, audience reviews, top-cast, directors, genres, production companies. Extracted in §2.1 via the <code>/movie/{id}</code> endpoint with <code>credits,reviews,release_dates</code> appended, 100-thread concurrent batches, 100-req/s rate-limit safety.</div>
+      <div><b>Source · Wikipedia.</b> Plot summaries and critical-reception sections retrieved via the MediaWiki API in §2.2. Title resolution by search + page-parse; section text isolated by regex on level-2 headings. Global rate-limit lock to stay under 150 req/min, checkpointed every 200 rows.</div>
+      <div><b>Inflation adjustment.</b> CPI from FRED series <code>CPIAUCSL</code>. <code>box_office_surplus_adj_2026 = (revenue − budget) × CPI<sub>2026</sub> / CPI<sub>release_year</sub></code>. Methodology in §2.3.</div>
+      <div><b>Two success metrics ("tracks").</b> Track A = absolute inflation-adjusted profit. Track B = each film's rank within its release year (time-invariant). The site lets you switch between the two — toggle top-right.</div>
     </div>
+
+    <div class="ds-sub-h"><span class="num">c · Schema</span><h4>Attributes we use</h4></div>
+    <p class="ds-sub-lede">The master table carries more columns than the analysis needs. The working subset, organised by which of the four lenses each column feeds, is below.</p>
+    <div class="attr-list">
+
+      <div class="attr-card a">
+        <span class="lens-tag">Lens 01 · Attributes</span>
+        <h5>Money, votes &amp; descriptors</h5>
+        <div class="attr-chips">
+          <code>box_office_surplus_adj_2026</code><code>release_year</code><code>budget_adj_2026</code><code>vote_count</code><code>vote_average</code><code>runtime</code><code>genres</code>
+        </div>
+        <p class="uses">Defines both tracks: Track A reads <code>box_office_surplus_adj_2026</code> directly, Track B takes its percentile rank inside each <code>release_year</code>. The same columns minus the headline metric are the numeric features ranked by Spearman ρ on the Attributes tab; <code>genres</code> drives the genre-median bars.</p>
+      </div>
+
+      <div class="attr-card b">
+        <span class="lens-tag">Lens 02 · Network</span>
+        <h5>Cast &amp; directors</h5>
+        <div class="attr-chips">
+          <code>top_cast</code><span class="grp">(first 10)</span><code>directors</code>
+        </div>
+        <p class="uses">Every node and edge of the collaboration graph. Each film links its top-10 cast plus its directors pairwise; pairs that share at least two films become weighted edges. Used for community detection, centrality, and the track-aware attribute assortativity test against a label-shuffle null.</p>
+      </div>
+
+      <div class="attr-card c">
+        <span class="lens-tag">Lens 03 · Plots</span>
+        <h5>Wikipedia plot text</h5>
+        <div class="attr-chips">
+          <code>wiki_plot</code><span class="grp">(free text)</span>
+        </div>
+        <p class="uses">Source for the plot-themes word-clouds and the per-community vocabulary cards on the Language tab. TF-IDF is fitted on the full 3,781-film corpus so common plot words don't dominate the per-cluster lists. Chi-squared collocations are merged into single tokens so multi-word phrases can surface.</p>
+      </div>
+
+      <div class="attr-card d">
+        <span class="lens-tag">Lens 04 · Reviews</span>
+        <h5>Audience &amp; critic reception text</h5>
+        <div class="attr-chips">
+          <code>reviews</code><span class="grp">(TMDb · audience)</span><code>wiki_critical_response</code><span class="grp">(Wikipedia · critic)</span>
+        </div>
+        <p class="uses">Two parallel corpora for the Language tab. TF-IDF on each surfaces the vocabulary that separates the top from the bottom of the active track; VADER computes per-tier compound sentiment for the gradient bar. Terms that show up on both sides earn an overlap badge.</p>
+      </div>
+
+    </div>
+    <p class="attr-foot"><b>Kept for provenance but not modelled.</b> <code>overview</code> (TMDb's short blurb — superseded by the longer Wikipedia plot), <code>production_companies</code> (extracted but not analysed), <code>us_regular_theatrical</code> (used as a row-level filter — every kept film has it true), and the identifier columns <code>tmdb_id</code>, <code>title</code>, <code>release_date</code>.</p>
   </div>
 </div></section>
 
@@ -503,14 +599,17 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Methodology</div>
   <h2>Two ways of <em>accounting for time</em></h2>
-  <p class="body-lg">Before asking what successful films have in common, we have to decide what <b>"successful"</b> means. A 2001 dollar, a 2025 blockbuster market, and a pandemic-era release year are not directly comparable. The site therefore follows two tracks throughout — and only patterns that survive <em>both</em> definitions reach the final recipe.</p></div>
+  <p class="body-lg">Before asking what successful films have in common, we have to decide what <b>"successful"</b> means. A 2001 dollar, a 2025 blockbuster market, and a pandemic-era release year are not directly comparable, so the analysis follows two tracks throughout. Only patterns that survive <em>both</em> reach the final recipe.</p></div>
   <div class="method">
     <div class="mcard a reveal"><h3>Track A — Whole period</h3><div class="fm">metric = inflation-adjusted profit ($2026)</div><p>Every film's revenue minus budget, expressed in 2026 dollars. Absolute scale: how much money, comparable across 25 years.</p></div>
     <div class="mcard b reveal"><h3>Track B — Per-year relative</h3><div class="fm">metric = profit percentile within release year</div><p>Each film ranked 0–100 against only the films it competed with that year. Removes the year effect entirely — pure relative success.</p></div>
   </div>
+
+  <p class="chart-lead reveal">A single picture motivates the dual-track design. The chart below counts, for each release year, how many films enter the <b>top 10%</b> under three competing definitions of success. If a definition were truly fair across time, the count would sit close to a constant: roughly one in ten of that year's cohort, every year.</p>
+
   <div class="chart-card reveal">
-    <h4>Why it matters: the fairness tests, side by side</h4>
-    <div class="cs">Films reaching the top&nbsp;10% by release year, across three definitions of success: raw whole-period dollars, $2026-adjusted whole-period dollars, and per-year relative ranking. Click a legend entry to hide or show that series &mdash; per-year is flat by design; raw dollars over-reward recent films; inflation-adjusted still tilts toward the recent past, just less.</div>
+    <h4>Top-10% films per year, under three definitions of success</h4>
+    <div class="cs">x-axis = release year, y-axis = number of films in the top decile that year. <b>Raw whole-period profit</b> over-rewards recent films (nominal dollars grow); <b>inflation-adjusted whole-period profit</b> still leans toward the recent past, just less; <b>per-year percentile</b> is flat by construction. Click a legend entry to hide a series.</div>
     <div class="tfchart" style="margin-top:24px">
       <svg class="tfsvg" id="tfsvg" viewBox="0 0 1000 340" preserveAspectRatio="none"></svg>
       <div class="tftip" id="tftip"></div>
@@ -518,15 +617,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="tflegend" id="tflegend-1"></div>
   </div>
 
-  <div class="reading-guide reveal">
-    <div class="tag">How to read the site</div>
-    <p class="body-lg">
-      Every section below asks the same question twice: does this pattern hold for <b>raw scale</b>
-      (Track&nbsp;A&nbsp;&middot; inflation-adjusted absolute profit) <em>and</em> for <b>year-relative performance</b>
-      (Track&nbsp;B&nbsp;&middot; per-year percentile)? When both tracks agree, the pattern becomes part of the
-      final recipe. When they disagree, the disagreement <em>is</em> the finding.
-    </p>
-  </div>
+  <p class="body-lg reveal" style="margin-top:30px">Per-year percentile is flat by design. The raw and adjusted curves are not, which is exactly the problem Track B exists to solve. The Attributes tab applies both tracks to the actual film-level features — popularity, budget, rating, runtime, genre — to see which signals survive both fairness conventions.</p>
 </div></section>
 
 </div>
@@ -536,15 +627,28 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <h2>What the numbers <em>actually</em> reward</h2>
   <span class="tbadge a aonly inl"><span class="dot"></span>Track A · inflation-adjusted profit</span>
   <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year percentile</span>
-  <p class="body-lg" style="margin-top:14px"><span class="aonly inl">Under absolute profit, raw popularity dominates and the model explains <b>59%</b> of variance.</span><span class="bonly inl">Judged per-year, popularity weakens and <b>critical rating jumps in importance</b> — the model explains <b>38%</b>, a harder, fairer target.</span></p></div>
+  <p class="body-lg" style="margin-top:14px">With two fair definitions of success in hand, the first concrete question is the simplest: which film-level attributes actually correlate with each? We rank four numeric features — audience vote count, inflation-adjusted budget, critical rating, and runtime — by Spearman ρ against the active track's success metric, then re-cut the data by genre and by budget tier. The three numbers below summarise how much of success these attributes capture, and where the picture changes between Track A and Track B.</p>
+  <p class="body-lg" style="margin-top:10px"><span class="aonly inl">Under absolute profit, raw popularity dominates and a four-feature linear model explains <b>59%</b> of the variance — but this is also the track inflated by time, so part of that fit is the chart-topping recent franchises.</span><span class="bonly inl">Judged per-year, popularity weakens and <b>critical rating jumps in importance</b>. The four-feature model now explains <b>38%</b>: a harder, fairer target that better separates films from their year, not from history.</span></p></div>
+
   <div class="stats reveal">
-    <div class="c1"><div class="n" id="s-r2">59%</div><p>of success variance explained by 4 attributes</p></div>
-    <div class="c2"><div class="n" id="s-vc">0.70</div><p>top correlate: <span id="s-vcl">audience vote count</span></p></div>
-    <div class="c3"><div class="n" id="s-va">+.01</div><p>standardized β for critical rating <span id="s-val"></span></p></div>
+    <div class="c1">
+      <div class="n" id="s-r2">59%</div>
+      <p>of success variance explained by just four numeric attributes (popularity, budget, rating, runtime) — the fit, not the recipe</p>
+    </div>
+    <div class="c2">
+      <div class="n" id="s-vc">0.70</div>
+      <p>Spearman ρ for the top correlate, <span id="s-vcl">audience vote count</span> — a proxy for "people are talking about this film"</p>
+    </div>
+    <div class="c3">
+      <div class="n" id="s-va">+.01</div>
+      <p>standardised β for critical rating <span id="s-val"></span> — near-zero under Track A, materially positive under Track B (quality only counts once scale is held constant)</p>
+    </div>
   </div>
+
+  <p class="body-lg reveal" style="margin-top:30px">The chart below makes the ranking concrete. Bars extend rightward for positive Spearman correlation; switching the active track at the top of the page reshuffles the order in place. Watch <b>vote count</b> shrink and <b>critical rating</b> grow as you move from absolute dollars to per-year percentile — the single biggest shift on this page.</p>
   <div class="chart-card reveal">
     <h4>Attribute correlation with success</h4>
-    <div class="cs">Spearman ρ — <span id="corr-track">Track A · inflation-adjusted profit</span></div>
+    <div class="cs">Spearman ρ between each numeric feature and the active success metric — <span id="corr-track">Track A · inflation-adjusted profit</span>. Range −1 (perfect inverse) to +1 (perfect agreement); zero = no monotonic relationship.</div>
     <div class="bars" id="corrbars"></div>
   </div>
 </div></section>
@@ -552,15 +656,16 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">02 · Budget</div>
   <h2>Two strategies, one <em>valley</em></h2>
-  <p class="body-lg aonly">Under absolute profit, the ROI curve is U-shaped: cheap films return most per dollar, mega-budgets are safest, the middle bleeds.</p>
-  <p class="body-lg bonly">Per-year, it's near-monotonic: bigger budgets buy higher relative rank almost linearly — scale is the surest way to beat your year.</p></div>
+  <p class="body-lg">Films are sorted into five equal-population budget tiers (inflation-adjusted), each holding roughly 750 titles, from cheapest (Q1) to priciest (Q5). The three panels below report the median outcome inside each tier under the active track.</p>
+  <p class="body-lg aonly">Under absolute profit, the ROI curve is U-shaped: cheap films return most per dollar (low denominators flatter the ratio), mega-budgets are the safest absolute earners, and the middle bleeds — large enough to need a real audience, not large enough to dominate marketing share-of-voice.</p>
+  <p class="body-lg bonly">Per-year, the curve is near-monotonic: bigger budgets buy higher relative rank almost linearly. Inside a single release year, scale is the surest way to beat your cohort — the mid-budget valley flattens out once we stop comparing across decades.</p></div>
   <div class="trio" id="budgettrio"></div>
 </div></section>
 
 <section><div class="wrap">
   <div class="reveal"><div class="tag">02 · Genre</div>
   <h2>Genre sets the <em>ceiling</em></h2>
-  <p class="body-lg"><span class="aonly inl">Median inflation-adjusted profit by genre.</span><span class="bonly inl">Median per-year percentile by genre — 50 = an average film for its year.</span> Animation tops both metrics.</p></div>
+  <p class="body-lg">Median success by genre, ranked under the active track. <span class="aonly inl">Track A reports median inflation-adjusted profit per film: animation, adventure and sci-fi lead because they're produced at scale, open wide, and lean on enduring IP.</span><span class="bonly inl">Track B reports median per-year percentile (50 = an average film for its year): the same big-tent genres still lead, but documentaries and dramas — typically modest in absolute dollars — climb the table once each film is judged against its own year's cohort.</span> The strongest signal in both views: animation tops the ranking either way.</p></div>
   <div class="chart-card reveal">
     <h4 id="genre-h">Genre ranking</h4><div class="cs" id="genre-cs"></div>
     <div class="bars" id="genrebars"></div>
@@ -585,8 +690,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
           <optgroup label="Centrality (week 6)">
             <option value="degree">Degree — # of collaborators</option>
             <option value="centrality_betweenness">Betweenness — bridges between clusters</option>
-            <option value="centrality_closeness">Closeness — reach across the graph</option>
             <option value="centrality_eigenvector">Eigenvector — dense core</option>
+            <option value="centrality_closeness">Closeness — reach across the graph</option>
           </optgroup>
         </select>
       </label>
@@ -648,8 +753,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <label title="How much the visual difference between weak and strong collaborations is emphasised. 1.0× = sqrt scaling." style="display:none">
         Edge relative strength
         <div class="rrow">
-          <input id="edge-relative" type="range" min="0.5" max="2.5" value="1.5" step="0.05" style="width:130px">
-          <span id="edge-relative-val">1.5×</span>
+          <input id="edge-relative" type="range" min="0.5" max="2.5" value="1.0" step="0.05" style="width:130px">
+          <span id="edge-relative-val">1.0×</span>
         </div>
       </label>
     </div>
@@ -818,7 +923,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <h4>What went well</h4>
       <ul>
         <li><b>Two-track methodology pays off</b> &mdash; rankings shift visibly between Track A and Track B, validating the inflation-fairness argument.</li>
-        <li><b>The network has real structure</b> &mdash; observed modularity 0.73 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
+        <li><b>The network has real structure</b> &mdash; observed modularity 0.71 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
         <li><b>Successful people cluster</b> &mdash; Newman attribute assortativity sharply positive and far outside the label-shuffle null under both tracks.</li>
         <li><b>Per-community vocabulary is interpretable</b> &mdash; corpus-wide IDF + bigrams surface coherent cluster vocabularies (MCU, Fast &amp; Furious, X-Men/LOTR), the network &times; text integration the rubric asks for.</li>
       </ul>
@@ -855,9 +960,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap nb-landing">
   <div class="kicker reveal">For the curious</div>
   <h2>The explainer <em>notebook</em></h2>
-  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis.ipynb</code>, which is structured per the four sections required by Project Assignment B &mdash; Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
+  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis-3.ipynb</code>, which is structured per the four sections required by Project Assignment B &mdash; Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
 
-  <a class="nb-big-btn reveal" id="nb-open" href="Analysis.ipynb" target="_blank" rel="noopener">
+  <a class="nb-big-btn reveal" id="nb-open" href="Analysis-3.ipynb" target="_blank" rel="noopener">
     Open the explainer notebook
     <span class="ic">&rarr;</span>
   </a>
@@ -878,8 +983,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
           <span class="ds-sub">same films + Wikipedia plot &amp; critical-reception text · ~32 MB</span>
         </span>
       </a>
-      <a class="nb-dl-btn" href="Analysis.ipynb" target="_blank" rel="noopener">
-        <span><b>Analysis.ipynb</b>
+      <a class="nb-dl-btn" href="Analysis-3.ipynb" target="_blank" rel="noopener">
+        <span><b>Analysis-3.ipynb</b>
           <span class="ds-sub">the explainer notebook source · run top-to-bottom to regenerate this site</span>
         </span>
       </a>
@@ -894,7 +999,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <ol>
       <li><b>&sect;1 Motivation</b> &mdash; what the dataset is, why we chose it, what the end user should learn.</li>
       <li><b>&sect;2 Basic stats</b> &mdash; how the data was collected (TMDb API &sect;2.1, Wikipedia API &sect;2.2, filter + CPI inflation &sect;2.3); cleaning choices; dataset shape; network properties; log-log degree distribution; Zipf rank-frequency on the review corpus.</li>
-      <li><b>&sect;3 Tools, theory &amp; analysis</b> &mdash; community detection (Louvain); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index.html</code>.</li>
+      <li><b>&sect;3 Tools, theory &amp; analysis</b> &mdash; community detection (greedy modularity); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index-3.html</code>.</li>
       <li><b>&sect;4 Discussion</b> &mdash; what went well, what's still missing, ethical limits &mdash; same content as this Discussion tab.</li>
     </ol>
   </div>
@@ -1016,8 +1121,12 @@ function render(){
   }
   document.getElementById('budgettrio').innerHTML=trio.map(c=>
     `<div class="card ${c[0]}"><div class="bar"></div><h3>${c[1]}</h3><div class="lab">${c[2]}</div><div class="big">${c[3]}</div><div class="rl">${c[4]}</div><p>${c[5]}</p></div>`).join('');
+  // network: track toggle now nudges the network's node-size mode
+  // (the explicit selector below still wins if the user touches it).
   const sizeSel = document.getElementById('node-size-mode');
-  if(sizeSel) sizeSel.value = A ? 'value_abs' : 'value_per_year';
+  if(sizeSel && !sizeSel.dataset.userTouched){
+    sizeSel.value = A ? 'value_abs' : 'value_per_year';
+  }
   drawInteractiveNetwork();
   // word clouds
   const tk=A?'A_whole_period':'B_per_year';
@@ -1073,7 +1182,7 @@ function renderNullComparison(){
   if(read){
     const dPart = (+t.observed_modularity) - (+t.config_modularity.mean);
     const dNat  = (+t.observed_modularity) - (+cfg_native.mean);
-    read.innerHTML = `<b>Read it (two tests in one).</b> Under our <em>observed partition</em>, random rewiring drops modularity to ~0 (a ${dPart.toFixed(2)}-point gap) &mdash; rigorous statistical proof that the communities we found are real. Under <em>native detection</em> (running Louvain on the random graph itself, the framing from the week-6 exercises), the null still finds modularity ~${(+cfg_native.mean).toFixed(2)} thanks to the resolution-limit artefact, and our observed ${(+t.observed_modularity).toFixed(2)} is ${dNat.toFixed(2)} above it &mdash; still a real signal, calibrated against the standard baseline.`;
+    read.innerHTML = `<b>Read it (two tests in one).</b> Under our <em>observed partition</em>, random rewiring drops modularity to ~0 (a ${dPart.toFixed(2)}-point gap) &mdash; rigorous statistical proof that the communities we found are real. Under <em>native detection</em> (running greedy modularity on the random graph itself, the framing from the week-6 exercises), the null still finds modularity ~${(+cfg_native.mean).toFixed(2)} thanks to the resolution-limit artefact, and our observed 0.71 is ${dNat.toFixed(2)} above it &mdash; still a real signal, calibrated against the standard baseline.`;
   }
   // Strip 2 — track-aware attribute assortativity
   if(aGrid && d.attribute_assortativity){
@@ -1197,7 +1306,7 @@ function wireNotebookLinks(){
   // local file so the link always works for viewers running the site locally.
   const PLACEHOLDER = /Vaksth\/comsocsci2026_final_project/;
   let url = (D && D.notebook_url) || '';
-  if(!url || PLACEHOLDER.test(url)) url = 'Analysis.ipynb';
+  if(!url || PLACEHOLDER.test(url)) url = 'Analysis-3.ipynb';
   const open = document.getElementById('nb-open');
   if(open) open.href = url;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
@@ -1481,17 +1590,17 @@ function drawTF(){
   TF_CHARTS.forEach((c, i) => drawLineChart(c, i));
 }
 
-// ── interactive network (canvas, D3-force layout) ───────────────
-// Node positions are computed by a synchronous D3-force simulation.
-// Positions are cached by (commFilter, minEdgeWeight) so panning/zooming
-// and slider tweaks are instant. Interactivity (hover, drag, pan, zoom) is
+// ── interactive network (canvas, static spring layout) ───────────
+// Renders the precomputed networkx spring_layout coordinates directly onto a
+// <canvas>. No d3-force simulation runs — node positions are stable across
+// filter changes and slider tweaks. Interactivity (hover, drag, pan, zoom) is
 // implemented on the canvas. Quadtree gives sub-millisecond hit-testing.
 const NET = {
   canvas: null, ctx: null, dpr: 1,
   cssW: 0, cssH: 0,
-  VW: 1200, VH: 750,          // virtual coordinate space
+  VW: 1000, VH: 620,          // virtual coordinate space (matches old viewBox)
   fit: { k: 1, x: 0, y: 0 },  // letterbox transform: virtual → canvas pixels
-  transform: { k: 0.85, x: 90, y: 56 }, // user pan/zoom (applied AFTER fit)
+  transform: { k: 1, x: 0, y: 0 }, // user pan/zoom (applied AFTER fit)
   nodes: [], edges: [], labels: [],
   quadtree: null, hover: null, drag: null, pan: null,
   mode: 'value_abs', r: null,
@@ -1556,7 +1665,7 @@ function _resizeCanvas(){
   const wrap = NET.canvas.parentElement;
   const dpr = NET.dpr = window.devicePixelRatio || 1;
   const cssW = wrap.clientWidth || 0;
-  const cssH = 750;
+  const cssH = 620;
   if(cssW < 80){ NET.cssW = 0; return; }   // hidden tab — wait for visibility
   NET.cssW = cssW; NET.cssH = cssH;
   NET.canvas.style.width  = cssW + 'px';
@@ -1607,7 +1716,7 @@ function _netSearch(q){
   });
 }
 function _netResetView(){
-  NET.transform = { k: 0.85, x: 90, y: 56 };
+  NET.transform = { k: 1, x: 0, y: 0 };
   _paintNetwork();
 }
 function _virtFromClient(clientX, clientY){
@@ -1719,7 +1828,7 @@ function _paintNetwork(){
     if(hover){
       // Single dim pass for non-touching edges across all buckets, then a
       // bright amber highlight for edges incident to the hovered node.
-      ctx.strokeStyle = `rgba(124,124,124,${Math.max(0.02, 0.045 * es)})`;
+      ctx.strokeStyle = `rgba(244,241,234,${Math.max(0.02, 0.045 * es)})`;
       ctx.lineWidth = 0.45 * invK;
       ctx.beginPath();
       for(const bucket of NET.edgeBuckets){
@@ -1742,7 +1851,7 @@ function _paintNetwork(){
     } else {
       for(const bucket of NET.edgeBuckets){
         if(!bucket.edges.length) continue;
-        ctx.strokeStyle = `rgba(124,124,124,${bucket.alpha})`;
+        ctx.strokeStyle = `rgba(244,241,234,${bucket.alpha})`;
         ctx.lineWidth = bucket.width * invK;
         ctx.beginPath();
         for(const e of bucket.edges){
@@ -1763,8 +1872,8 @@ function _paintNetwork(){
     ctx.fill();
     ctx.globalAlpha = 1;
     if(!dim){
-      ctx.strokeStyle = '#555555';
-      ctx.lineWidth = 1 * invK;
+      ctx.strokeStyle = 'rgba(10,10,12,0.7)';
+      ctx.lineWidth = 0.55 * invK;
       ctx.stroke();
     }
   }
@@ -1814,10 +1923,9 @@ function updateNodeScale(){
   const vals = NET.nodes.map(d => Math.max(0, +d[NET.mode] || 0));
   const r = d3.scalePow().exponent(exponent)
     .domain([0, d3.max(vals) || 1])
-    .range([0.5 * ns, 20 * ns]);
+    .range([2.4 * ns, 22 * ns]);
   NET.r = r;
   NET.nodes.forEach(n => { n.pr = r(+n[NET.mode] || 0); });
-
   _paintNetwork();
 }
 function _bucketEdges(){
@@ -1841,7 +1949,7 @@ function _bucketEdges(){
   for(let i = 0; i < TIERS; i++){
     const t = TIERS === 1 ? 0.5 : i / (TIERS - 1);   // 0..1
     buckets[i].alpha = Math.min(0.95, (0.045 + 0.22 * t) * es);
-    buckets[i].width = 1.5 + 1.0 * t;               // px (before invK scaling) — netwulf link_width 2, variation 0.5
+    buckets[i].width = 0.40 + 1.10 * t;              // px (before invK scaling)
   }
   NET.edgeBuckets = buckets;
 }
@@ -1921,13 +2029,66 @@ function drawInteractiveNetwork(){
     return;
   }
 
-  // Radii: compute sizes FIRST so the force simulation can use actual node
-  // sizes as collision radii — prevents overlap from the start.
+  // ── Static spring layout from networkx ─────────────────────────
+  // Use the precomputed (n.x, n.y) coordinates directly — same layout the
+  // matplotlib PNGs use. No d3-force, no jitter, repeatable across reloads.
+  const xs = d3.extent(nodes, d => +d.x);
+  const ys = d3.extent(nodes, d => +d.y);
+  const sx = d3.scaleLinear().domain(xs).range([60, NET.VW - 60]);
+  const sy = d3.scaleLinear().domain(ys).range([60, NET.VH - 60]);
+  nodes.forEach(n => { n.px = sx(+n.x); n.py = sy(+n.y); });
+
+  // Re-layout when a single community is isolated: the static spring
+  // coordinates were computed for the FULL graph, so a community's members
+  // are scattered across the canvas and rescaling a sparse subset just
+  // spreads it thin. Run a short force relaxation on the subgraph so the
+  // cluster reads as a coherent group, centred in the viewport.
+  if(commFilter !== '' && !Number.isNaN(+commFilter) && nodes.length > 1 && nodes.length <= 1200){
+    const cx = NET.VW / 2, cy = NET.VH / 2;
+    const idMap = new Map(nodes.map(n => [n.id, n]));
+    const simEdges = [];
+    for(const e of edges){
+      const s = typeof e.source === 'object' ? e.source.id : e.source;
+      const t = typeof e.target === 'object' ? e.target.id : e.target;
+      if(idMap.has(s) && idMap.has(t)) simEdges.push({ source: idMap.get(s), target: idMap.get(t), weight: +e.weight || 1 });
+    }
+    nodes.forEach(n => { n.x = n.px; n.y = n.py; });
+    const sim = d3.forceSimulation(nodes)
+      .force('charge', d3.forceManyBody().strength(-120))
+      .force('link', d3.forceLink(simEdges).id(d => d.id)
+        .distance(d => 40 / Math.sqrt(d.weight)).strength(0.6))
+      .force('center', d3.forceCenter(cx, cy))
+      .force('collide', d3.forceCollide().radius(10))
+      .stop();
+    const ticks = Math.min(220, 60 + nodes.length);
+    for(let i = 0; i < ticks; i++) sim.tick();
+    // Refit the relaxed cloud to the viewport with margins
+    let rxs = d3.extent(nodes, d => d.x);
+    let rys = d3.extent(nodes, d => d.y);
+    if(!(rxs[1] > rxs[0])) rxs = [rxs[0] - 1, rxs[0] + 1];
+    if(!(rys[1] > rys[0])) rys = [rys[0] - 1, rys[0] + 1];
+    const rsx = d3.scaleLinear().domain(rxs).range([80, NET.VW - 80]);
+    const rsy = d3.scaleLinear().domain(rys).range([80, NET.VH - 80]);
+    nodes.forEach(n => {
+      const px = rsx(n.x), py = rsy(n.y);
+      n.px = Number.isFinite(px) ? px : NET.VW / 2;
+      n.py = Number.isFinite(py) ? py : NET.VH / 2;
+    });
+  }
+
+  // Community-coloured fills (same 17-colour palette as the static PNGs)
+  const palette = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffb300','#a65628','#f781bf','#999999','#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3'];
+  nodes.forEach(n => { n.color = palette[(+n.community || 0) % palette.length]; });
+
+  // Radii: overall-size slider × scalePow with exponent from the relative-size slider
   const ns = _readSlider('node-scale', 1);
   const nr = _readSlider('node-relative', 1);
   _writeLabel('node-scale-val',    ns.toFixed(1) + '×');
   _writeLabel('node-relative-val', nr.toFixed(1) + '×');
-  const exponent = mode === 'value_per_year' ? 1.0 * nr : 0.5 * nr;  // per-year: stronger contrast between large/small
+  const exponent = 0.5 * nr;                          // 1.0 → 0.5 (sqrt, default)
+  // Year-window aware node value. If the release-year window is the full
+  // span, use the precomputed career total/avg (d[mode]); otherwise sum
+  // (absolute) or average (per-year) only the years inside the window.
   const yrAll = (D.network && D.network.years) || [];
   const yMinEl = document.getElementById('yr-min');
   const yMaxEl = document.getElementById('yr-max');
@@ -1951,58 +2112,11 @@ function drawInteractiveNetwork(){
   const vals = nodes.map(d => Math.max(0, d._wval || 0));
   const r = d3.scalePow().exponent(exponent)
     .domain([0, d3.max(vals) || 1])
-    .range([0.5 * ns, 20 * ns]);
+    .range([2.4 * ns, 22 * ns]);
   nodes.forEach(n => {
     const rr = r(Math.max(0, n._wval || 0));
-    n.pr = (Number.isFinite(rr) && rr > 0) ? rr : 0.1;
+    n.pr = (Number.isFinite(rr) && rr > 0) ? rr : 1;
   });
-
-  // Community-coloured fills (same 17-colour palette as the static PNGs)
-  const palette = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffb300','#a65628','#f781bf','#999999','#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f','#e5c494','#b3b3b3'];
-  nodes.forEach(n => { n.color = palette[(+n.community || 0) % palette.length]; });
-
-  // ── D3-force layout (collision radius = actual node size) ────────────
-  // Positions cached by (commFilter, minW) — slider tweaks run only the
-  // short relaxation in updateNodeScale, not this full simulation.
-  // Cache key includes mode so per-year and abs layouts are stored separately
-  // (per-year uses lower gravity, producing a different equilibrium).
-  const _posKey = commFilter + '|' + minW + '|' + mode;
-  if(NET._posCache && NET._posCache.key === _posKey && NET._posCache.map.size === nodes.length){
-    const cached = NET._posCache.map;
-    nodes.forEach(n => { const p = cached.get(n.id); if(p){ n.px = p[0]; n.py = p[1]; } });
-  } else {
-    const cx = NET.VW / 2, cy = NET.VH / 2;
-    const idMap = new Map(nodes.map(n => [n.id, n]));
-    const simEdges = [];
-    for(const e of edges){
-      const s = typeof e.source === 'object' ? e.source.id : e.source;
-      const t = typeof e.target === 'object' ? e.target.id : e.target;
-      const sn = idMap.get(s), tn = idMap.get(t);
-      if(sn && tn) simEdges.push({ source: sn, target: tn, weight: +e.weight || 1 });
-    }
-    // Seeded pseudo-random spread (Mulberry32) — avoids the border-ring artifact
-    // that a circle seed produces when 2500+ nodes have sub-pixel spacing.
-    let _s = 42;
-    const _rnd = () => { _s |= 0; _s = _s + 0x6D2B79F5 | 0; let t = Math.imul(_s ^ _s >>> 15, 1 | _s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-    const pad = 80;
-    nodes.forEach(n => { n.x = pad + _rnd() * (NET.VW - 2*pad); n.y = pad + _rnd() * (NET.VH - 2*pad); });
-    const ticks = nodes.length > 1500 ? 200 : nodes.length > 500 ? 300 : 400;
-    const gravity = mode === 'value_per_year' ? 0.06 : 0.1;
-    const charge = mode === 'value_per_year' ? -55 : -30;
-    const sim = d3.forceSimulation(nodes)
-      .force('charge', d3.forceManyBody().strength(charge))
-      .force('link', d3.forceLink(simEdges).id(d => d.id).distance(5).strength(0.4))
-      .force('x', d3.forceX(cx).strength(gravity))
-      .force('y', d3.forceY(cy).strength(gravity))
-      .force('collide', d3.forceCollide().radius(d => d.pr + 2).strength(1.0))
-      .stop();
-    for(let i = 0; i < ticks; i++) sim.tick();
-    nodes.forEach(n => {
-      n.px = Number.isFinite(n.x) ? n.x : cx;
-      n.py = Number.isFinite(n.y) ? n.y : cy;
-    });
-    NET._posCache = { key: _posKey, map: new Map(nodes.map(n => [n.id, [n.px, n.py]])) };
-  }
 
   // Resolve edge endpoints to node objects (so paint can read .px / .py)
   const byId = new Map(nodes.map(n => [n.id, n]));
@@ -2037,8 +2151,8 @@ function drawInteractiveNetwork(){
     'value_per_year':         'per-year percentile (average per film)',
     'degree':                 'degree centrality (# collaborators)',
     'centrality_betweenness': 'betweenness centrality (bridges between clusters)',
-    'centrality_closeness':   'closeness centrality (reach across the graph)',
     'centrality_eigenvector': 'eigenvector centrality (dense core)',
+    'centrality_closeness':   'closeness centrality (reach across the graph)',
   };
   const modeName = MODE_LABELS[mode] || mode;
   const commLabel = (commFilter !== '' && commSel && commSel.selectedOptions[0])

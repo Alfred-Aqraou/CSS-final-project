@@ -284,17 +284,6 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   text-transform:uppercase;margin:0 0 12px;opacity:.85}
 .sent-grp:last-child{margin-bottom:0}
 
-.year-range-label{min-width:230px}
-.yr-val{font-family:'Space Mono',monospace;font-size:11px;color:#46d6e0;margin-left:6px}
-.yr-range{position:relative;height:30px;margin-top:8px}
-.yr-range input[type=range]{position:absolute;left:0;top:10px;width:100%;margin:0;
-  background:none;pointer-events:none;-webkit-appearance:none;appearance:none;height:0}
-.yr-range input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;
-  width:14px;height:14px;border-radius:50%;background:#46d6e0;border:2px solid #0a0a0c;cursor:pointer;margin-top:-6px}
-.yr-range input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;
-  border-radius:50%;background:#46d6e0;border:2px solid #0a0a0c;cursor:pointer}
-.yr-track{position:absolute;left:0;top:13px;width:100%;height:4px;background:#26262c;border-radius:2px}
-.yr-fill{position:absolute;height:100%;background:#46d6e0;border-radius:2px}
 
 .net-search-label input{width:100%;background:#0e0e11;border:1px solid #26262c;color:#f4f1ea;
   font-family:'Space Mono',monospace;font-size:12px;padding:7px 9px;border-radius:5px;margin-top:6px}
@@ -711,14 +700,6 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
         <select id="community-filter">
           <option value="">All communities</option>
         </select>
-      </label>
-      <label class="year-range-label" title="Node size is computed only from films released inside this window. Drag either handle. Full range = career totals.">
-        Release-year window <span id="yr-range-val" class="yr-val">2000 – present</span>
-        <div class="yr-range">
-          <input id="yr-min" type="range" min="2000" max="2026" value="2000" step="1">
-          <input id="yr-max" type="range" min="2000" max="2026" value="2026" step="1">
-          <div class="yr-track"><div class="yr-fill" id="yr-fill"></div></div>
-        </div>
       </label>
       <label class="net-search-label">
         Find a person
@@ -2146,26 +2127,8 @@ function drawInteractiveNetwork(){
   _writeLabel('node-scale-val',    ns.toFixed(1) + '×');
   _writeLabel('node-relative-val', nr.toFixed(1) + '×');
   const exponent = mode === 'value_per_year' ? 1.0 * nr : 0.5 * nr;  // per-year: stronger contrast between large/small
-  const yrAll = (D.network && D.network.years) || [];
-  const yMinEl = document.getElementById('yr-min');
-  const yMaxEl = document.getElementById('yr-max');
-  let wMin = yMinEl ? +yMinEl.value : (yrAll[0] || 2000);
-  let wMax = yMaxEl ? +yMaxEl.value : (yrAll[yrAll.length-1] || 2026);
-  if(wMin > wMax){ const t=wMin; wMin=wMax; wMax=t; }
-  const fullSpan = yrAll.length && wMin <= yrAll[0] && wMax >= yrAll[yrAll.length-1];
-  const isAbs = (mode === 'value_abs');
-  function windowedValue(d){
-    if(fullSpan) return Math.max(0, +d[mode] || 0);
-    const map = isAbs ? d.yabs : d.ypct;
-    if(!map) return 0;
-    if(isAbs){
-      let s=0; for(let y=wMin;y<=wMax;y++){ const v=map[y]; if(v) s+=+v; } return Math.max(0,s);
-    } else {
-      let s=0,n=0; for(let y=wMin;y<=wMax;y++){ const v=map[y]; if(v!=null){ s+=+v; n++; } }
-      return n? s/n : 0;
-    }
-  }
-  nodes.forEach(n => { n._wval = windowedValue(n); });
+  // Always use career totals (full span) — year window slider removed.
+  nodes.forEach(n => { n._wval = Math.max(0, +n[mode] || 0); });
   const vals = nodes.map(d => Math.max(0, d._wval || 0));
   const r = d3.scalePow().exponent(exponent)
     .domain([0, d3.max(vals) || 1])
@@ -2267,7 +2230,6 @@ function drawInteractiveNetwork(){
     (commLabel ? `filtered to <span class="hi">${commLabel}</span> &middot; ` : '') +
     `minimum shared films <span class="hi">${minW}</span> &middot; ` +
     `node size = <span class="hi">${modeName}</span>` +
-    (!fullSpan ? ` &middot; years <span class="hi">${wMin}\u2013${wMax}</span>` : '') +
     (meta.modularity != null && !commLabel ? ` &middot; community modularity ${(+meta.modularity).toFixed(3)}` : '');
 
   drawNet();
@@ -2289,29 +2251,6 @@ addEventListener('DOMContentLoaded', () => {
   if(lbl){ lbl.addEventListener('change', drawInteractiveNetwork); }
   const commSel = document.getElementById('community-filter');
   if(commSel){ commSel.addEventListener('change', drawInteractiveNetwork); }
-  const yMin = document.getElementById('yr-min');
-  const yMax = document.getElementById('yr-max');
-  function syncYearUI(){
-    if(!yMin || !yMax) return;
-    let lo = +yMin.value, hi = +yMax.value;
-    if(lo > hi){ const t=lo; lo=hi; hi=t; }
-    const yrs = (D.network && D.network.years) || [2000,2026];
-    const y0 = yrs[0], y1 = yrs[yrs.length-1];
-    const pctLo = (lo - y0) / (y1 - y0) * 100;
-    const pctHi = (hi - y0) / (y1 - y0) * 100;
-    const fill = document.getElementById('yr-fill');
-    if(fill){ fill.style.left = pctLo + '%'; fill.style.width = (pctHi - pctLo) + '%'; }
-    const lab = document.getElementById('yr-range-val');
-    if(lab){
-      const full = (lo <= y0 && hi >= y1);
-      lab.textContent = full ? (y0 + ' – present')
-        : (lo === hi ? String(lo) : (lo + ' – ' + hi));
-    }
-  }
-  function onYear(){ syncYearUI(); drawInteractiveNetwork(); }
-  if(yMin) yMin.addEventListener('input', onYear);
-  if(yMax) yMax.addEventListener('input', onYear);
-  syncYearUI();
   const nsearch = document.getElementById('net-search');
   if(nsearch){
     nsearch.addEventListener('input', e => _netSearch(e.target.value));

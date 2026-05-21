@@ -577,14 +577,14 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <div class="prog" id="prog"></div>
 <nav class="tabs" id="tabs"><div class="twrap">
   <div class="tab-group">
-    <button data-target="hero"        onclick="setActiveTab('hero')">Intro</button>
-    <button data-target="methodology" onclick="setActiveTab('methodology')">Methodology</button>
-    <button data-target="attributes"  onclick="setActiveTab('attributes')">Attributes</button>
-    <button data-target="network"     onclick="setActiveTab('network')">Network</button>
-    <button data-target="text"        onclick="setActiveTab('text')">Language</button>
-    <button data-target="recipe"      onclick="setActiveTab('recipe')">Recipe</button>
-    <button data-target="discussion"  onclick="setActiveTab('discussion')">Discussion</button>
-    <button data-target="notebook"    onclick="setActiveTab('notebook')">Notebook</button>
+    <button data-target="hero"        onclick="setActiveTab('hero')"><span class="tnum">01</span>Intro</button>
+    <button data-target="methodology" onclick="setActiveTab('methodology')"><span class="tnum">02</span>Methodology</button>
+    <button data-target="attributes"  onclick="setActiveTab('attributes')"><span class="tnum">03</span>Attributes</button>
+    <button data-target="network"     onclick="setActiveTab('network')"><span class="tnum">04</span>Network</button>
+    <button data-target="text"        onclick="setActiveTab('text')"><span class="tnum">05</span>Language</button>
+    <button data-target="recipe"      onclick="setActiveTab('recipe')"><span class="tnum">06</span>Recipe</button>
+    <button data-target="discussion"  onclick="setActiveTab('discussion')"><span class="tnum">07</span>Discussion</button>
+    <button data-target="notebook"    onclick="setActiveTab('notebook')"><span class="tnum">08</span>Notebook</button>
   </div>
   <div class="track-switch" role="tablist" aria-label="Track">
     <button id="ta" class="on" onclick="setTrack('a')">Track A · Absolute</button>
@@ -718,7 +718,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div>
 <div class="tab-pane" data-tab="attributes">
 <section><div class="wrap">
-  <div class="reveal"><div class="tag">02 · Attributes</div>
+  <div class="reveal"><div class="tag">Attributes</div>
   <h2>What the numbers <em>actually</em> reward</h2>
   <span class="tbadge a aonly inl"><span class="dot"></span>Track A · inflation-adjusted profit</span>
   <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year percentile</span>
@@ -750,7 +750,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div></section>
 
 <section><div class="wrap">
-  <div class="reveal"><div class="tag">02 · Budget</div>
+  <div class="reveal"><div class="tag">Budget</div>
   <h2>Two strategies, one <em>valley</em></h2>
   <p class="body-lg">Films are sorted into five equal-population budget tiers (inflation-adjusted), each holding roughly 750 titles, from cheapest (Q1) to priciest (Q5). The three panels below report the median outcome inside each tier under the active track.</p>
   <p class="body-lg aonly">Under absolute profit, the ROI curve is U-shaped: cheap films return most per dollar (low denominators flatter the ratio), mega-budgets are the safest absolute earners, and the middle bleeds. Mid-range films need a real audience but are not large enough to dominate marketing share-of-voice.</p>
@@ -759,7 +759,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div></section>
 
 <section><div class="wrap">
-  <div class="reveal"><div class="tag">02 · Genre</div>
+  <div class="reveal"><div class="tag">Genre</div>
   <h2>Genre sets the <em>ceiling</em></h2>
   <p class="body-lg">Median success by genre, ranked under the active track. <span class="aonly inl">Track A reports median inflation-adjusted profit per film: animation, adventure and sci-fi lead because they're produced at scale, open wide, and lean on enduring IP.</span><span class="bonly inl">Track B reports median per-year percentile (50 = an average film for its year): the same big-tent genres still lead, but documentaries and dramas (typically modest in absolute dollars) climb the table once each film is judged against its own year's cohort.</span> The strongest signal in both views: animation tops the ranking either way.</p></div>
   <div class="chart-card reveal">
@@ -771,7 +771,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div>
 <div class="tab-pane" data-tab="network">
 <section><div class="wrap">
-  <div class="reveal"><div class="tag">01 · Collaboration Network</div>
+  <div class="reveal"><div class="tag">Collaboration Network</div>
   <h2>The connectors aren't the <em>earners</em></h2>
   <div class="net-strip">
     <button class="net-strip-toggle open" id="net-strip-btn" onclick="toggleNetStrip()">

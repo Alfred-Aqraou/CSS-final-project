@@ -256,6 +256,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 .net-controls input[type=range]{padding:6px 0;accent-color:var(--amber)}
 .net-controls .rrow{display:flex;align-items:center;gap:10px}
 .net-controls .rrow #edge-weight-val{font-family:var(--mono);font-size:12px;color:var(--amber);min-width:18px}
+.net-reset-wrap{display:flex;align-items:flex-end}
+.net-reset-btn{background:transparent;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:6px;cursor:pointer;transition:border-color .15s,color .15s}
+.net-reset-btn:hover{border-color:var(--amber);color:var(--amber)}
 .net-wrap{position:relative;height:620px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:radial-gradient(circle at 50% 50%,rgba(70,214,224,.05),transparent 55%)}
 #network-canvas{display:block;width:100%;height:620px;cursor:grab;border-radius:8px;background:radial-gradient(ellipse 70% 55% at 50% 50%,rgba(244,183,64,.03),transparent 70%),#0d0d10}
 #network-canvas.dragging{cursor:grabbing}
@@ -823,6 +826,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
         <input id="net-search" type="text" placeholder="e.g. Tom Cruise" autocomplete="off" spellcheck="false">
         <div id="net-search-results"></div>
       </label>
+      <div class="net-reset-wrap">
+        <button class="net-reset-btn" onclick="_netResetAll()" title="Restore default edge weight, node size, labels and view">Reset</button>
+      </div>
       <label title="Drag to scale every node up or down together. 1.0× = default visual." style="display:none">
         Node size
         <div class="rrow">
@@ -1467,20 +1473,7 @@ function wireNotebookLinks(){
   const open = document.getElementById('nb-open');
   if(open) open.href = url;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-  // Dataset-intro stats from the network analysis (§3.2)
-  const nc = D && D.null_comparison;
-  if(nc){
-    set('ds-nodes', (nc.n_nodes || 0).toLocaleString());
-    set('ds-edges', (nc.n_edges || 0).toLocaleString());
-    set('ds-mod',   (nc.topology && nc.topology.observed_modularity != null)
-                     ? (+nc.topology.observed_modularity).toFixed(3) : '—');
-  }
-  // ds-comms = actual community count from the network (Network meta), not the
-  // count of communities shown in the per-community panel (which is capped at 5).
-  if(D.network && D.network.nodes){
-    const comms = new Set(D.network.nodes.map(n => n.community));
-    set('ds-comms', String(comms.size));
-  } else if(D.per_community_tfidf && D.per_community_tfidf.length){
+  if(D.per_community_tfidf && D.per_community_tfidf.length){
     set('ds-comms', String(D.per_community_tfidf.length) + '+');
   }
   // Methodology-section "metric agreement" stats
@@ -1862,7 +1855,12 @@ function _netSearch(q){
   const box = document.getElementById('net-search-results');
   if(!box) return;
   q = (q||'').trim().toLowerCase();
-  if(!q || !NET.nodes){ box.innerHTML=''; return; }
+  if(!q || !NET.nodes){
+    box.innerHTML='';
+    NET.pinned = null;
+    _paintNetwork();
+    return;
+  }
   const hits = NET.nodes
     .filter(n => (n.id||'').toLowerCase().includes(q))
     .sort((a,b) => (b._wval||0)-(a._wval||0))
@@ -1883,6 +1881,22 @@ function _netSearch(q){
 function _netResetView(){
   NET.transform = { k: 0.85, x: 90, y: 56 };
   _paintNetwork();
+}
+function _netResetAll(){
+  const ew = document.getElementById('edge-weight');
+  if(ew){ ew.value = 2; document.getElementById('edge-weight-val').textContent = '2'; }
+  const sz = document.getElementById('node-size-mode');
+  if(sz){ sz.value = 'value_abs'; sz.dataset.userTouched = ''; }
+  const lbl = document.getElementById('node-label-mode');
+  if(lbl) lbl.value = '0';
+  const comm = document.getElementById('community-filter');
+  if(comm) comm.value = '';
+  const inp = document.getElementById('net-search');
+  if(inp) inp.value = '';
+  document.getElementById('net-search-results').innerHTML = '';
+  NET.pinned = null;
+  NET.transform = { k: 0.85, x: 90, y: 56 };
+  drawInteractiveNetwork();
 }
 function _virtFromClient(clientX, clientY){
   // Inverse of: ctx.translate(fit.x,fit.y) * scale(fit.k) * translate(tx,ty) * scale(tk)
@@ -1909,8 +1923,11 @@ function _netOnMove(ev){
     return;
   }
   if(NET.pan){
-    NET.transform.x = NET.pan.tx + (ev.clientX - NET.pan.x) / NET.fit.k;
-    NET.transform.y = NET.pan.ty + (ev.clientY - NET.pan.y) / NET.fit.k;
+    const dx = ev.clientX - NET.pan.x;
+    const dy = ev.clientY - NET.pan.y;
+    if(Math.abs(dx) > 3 || Math.abs(dy) > 3) NET.pan.moved = true;
+    NET.transform.x = NET.pan.tx + dx / NET.fit.k;
+    NET.transform.y = NET.pan.ty + dy / NET.fit.k;
     _paintNetwork();
     return;
   }
@@ -1942,12 +1959,16 @@ function _netOnDown(ev){
     const p = _virtFromClient(ev.clientX, ev.clientY);
     NET.drag = { node: found, dx: p.x - found.px, dy: p.y - found.py };
   } else {
-    NET.pan = { x: ev.clientX, y: ev.clientY, tx: NET.transform.x, ty: NET.transform.y };
-    NET.pinned = null;
+    NET.pan = { x: ev.clientX, y: ev.clientY, tx: NET.transform.x, ty: NET.transform.y, moved: false };
   }
   if(NET.canvas) NET.canvas.classList.add('dragging');
 }
 function _netOnUp(){
+  if(NET.pan && !NET.pan.moved){
+    // True click on empty canvas (no drag) — clear pin
+    NET.pinned = null;
+    _paintNetwork();
+  }
   NET.drag = null; NET.pan = null;
   if(NET.canvas) NET.canvas.classList.remove('dragging');
 }
@@ -2210,19 +2231,13 @@ function drawInteractiveNetwork(){
   }
   netData = nodes;
 
-  // Live dataset stats — update header row when edge-weight or community filter changes
-  { const dsN = document.getElementById('ds-nodes');
-    const dsE = document.getElementById('ds-edges');
-    const dsMod = document.getElementById('ds-mod');
-    const defaultMinW = 2;
-    if(dsN) dsN.textContent = nodes.length.toLocaleString();
-    if(dsE) dsE.textContent = edges.length.toLocaleString();
-    if(dsMod){
-      const obsQ = (D.null_comparison && D.null_comparison.topology && D.null_comparison.topology.observed_modularity != null)
-        ? D.null_comparison.topology.observed_modularity.toFixed(3) : null;
-      dsMod.textContent = (minW === defaultMinW && commFilter === '' && obsQ) ? obsQ : '—';
-    }
+  // Re-resolve NET.pinned to the current node objects (map() creates new objects each call)
+  if(NET.pinned){
+    const pinnedId = NET.pinned.id;
+    NET.pinned = nodes.find(n => n.id === pinnedId) || null;
   }
+
+  // Filtered counts are shown in network-meta (below canvas) and update automatically.
 
   if(!nodes.length){
     NET.nodes = []; NET.edges = []; NET.labels = []; NET.quadtree = null;
@@ -2325,7 +2340,6 @@ function drawInteractiveNetwork(){
   _bucketEdges();   // initial edge tiers using current slider values
 
   // Meta caption
-  const meta = net.meta || {};
   const MODE_LABELS = {
     'value_abs':              'absolute adjusted profit',
     'value_per_year':         'per-year percentile (average per film)',
@@ -2337,13 +2351,17 @@ function drawInteractiveNetwork(){
   const modeName = MODE_LABELS[mode] || mode;
   const commLabel = (commFilter !== '' && commSel && commSel.selectedOptions[0])
     ? commSel.selectedOptions[0].textContent : null;
+  // Modularity: show observed value for the full unfiltered network, dash otherwise
+  const obsQ = (D.null_comparison && D.null_comparison.topology && D.null_comparison.topology.observed_modularity != null)
+    ? D.null_comparison.topology.observed_modularity : null;
+  const isFullNet = (minW === 2 && commFilter === '');
   document.getElementById('network-meta').innerHTML =
     `<span class="hi">${nodes.length.toLocaleString()}</span> people &middot; ` +
     `<span class="hi">${resolvedEdges.length.toLocaleString()}</span> collaborations &middot; ` +
     (commLabel ? `filtered to <span class="hi">${commLabel}</span> &middot; ` : '') +
     `minimum shared films <span class="hi">${minW}</span> &middot; ` +
-    `node size = <span class="hi">${modeName}</span>` +
-    (meta.modularity != null && !commLabel ? ` &middot; community modularity ${(+meta.modularity).toFixed(3)}` : '');
+    `node size = <span class="hi">${modeName}</span> &middot; ` +
+    `modularity = <span class="hi">${isFullNet && obsQ != null ? obsQ.toFixed(3) : '—'}</span>`;
 
   drawNet();
   _paintNetwork();
@@ -2357,8 +2375,10 @@ addEventListener('DOMContentLoaded', () => {
   }
   const ew = document.getElementById('edge-weight');
   if(ew){
-    ew.addEventListener('input', () => { document.getElementById('edge-weight-val').textContent = ew.value; });
-    ew.addEventListener('change', drawInteractiveNetwork);
+    ew.addEventListener('input', () => {
+      document.getElementById('edge-weight-val').textContent = ew.value;
+      drawInteractiveNetwork();
+    });
   }
   const lbl = document.getElementById('node-label-mode');
   if(lbl){ lbl.addEventListener('change', drawInteractiveNetwork); }

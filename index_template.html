@@ -923,7 +923,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="reveal">
     <div class="tag">Audience vs Critics</div>
     <h2>How <em>audiences</em> diverge from <em>critics</em></h2>
-    <p class="body-lg">Two takes on the same films: <b>audience reviews</b> (TMDb, live TF-IDF on the active track, plus VADER sentiment) vs <b>critical reception</b> (Wikipedia, live TF-IDF on the active track, plus VADER sentiment). Where both sides land on the same term, it carries an overlap badge — those are the words the recipe should care about most.</p>
+    <p class="body-lg">Two takes on the same films: <b>audience reviews</b> (TMDb, TF-IDF on the active track, plus VADER sentiment) vs <b>critical reception</b> (Wikipedia, TF-IDF on the active track, plus VADER sentiment). Where both sides land on the same term, it carries an overlap badge — those are the words the recipe should care about most.</p>
     <span class="tbadge a aonly inl"><span class="dot"></span>Track A · adjusted profit</span>
     <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year</span>
   </div>
@@ -939,11 +939,11 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <h4>What success sounds like — top 10% by current track</h4>
     <div class="rc-row-pair">
       <div class="rc-card audience">
-        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · live TF-IDF</span></div>
+        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · TF-IDF</span></div>
         <div id="rc-aud-hi" class="rc-terms"></div>
       </div>
       <div class="rc-card critic">
-        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · live TF-IDF</span></div>
+        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · TF-IDF</span></div>
         <div id="rc-cri-hi" class="rc-terms"></div>
       </div>
     </div>
@@ -951,11 +951,11 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <h4 style="margin-top:32px">What failure sounds like — bottom 10% by current track</h4>
     <div class="rc-row-pair">
       <div class="rc-card audience">
-        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · live TF-IDF</span></div>
+        <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · TF-IDF</span></div>
         <div id="rc-aud-lo" class="rc-terms"></div>
       </div>
       <div class="rc-card critic">
-        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · live TF-IDF</span></div>
+        <div class="rc-head"><span>Critic reception</span><span class="src">Wikipedia · TF-IDF</span></div>
         <div id="rc-cri-lo" class="rc-terms"></div>
       </div>
     </div>
@@ -1513,8 +1513,8 @@ function setWC(p,base,tk){
   const T = dyn || TERMS[base][tk];
   const elH = document.getElementById('t-'+p+'-h');
   const elL = document.getElementById('t-'+p+'-l');
-  if(elH) elH.innerHTML = renderTfidfList(T.hi);
-  if(elL) elL.innerHTML = renderTfidfList(T.lo);
+  if (elH) elH.innerHTML = renderTfidfList(T.hi.slice(0, 10));
+  if (elL) elL.innerHTML = renderTfidfList(T.lo.slice(0, 10));
 }
 
 // Normalize TERMS entries (string or {term,score}) to {term, score|null}
@@ -1568,10 +1568,14 @@ function renderReviewsCriticsCompare(){
 
   const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
   // Audience HIGH overlaps with critic HIGH; audience LOW with critic LOW
-  set('rc-aud-hi', renderCard(audHi, criHiSet));
-  set('rc-cri-hi', renderCard(criHi, audHiSet));
-  set('rc-aud-lo', renderCard(audLo, criLoSet));
-  set('rc-cri-lo', renderCard(criLo, audLoSet));
+  // limit to top 10
+  const topN = (arr, n=10) => arr.slice(0, n);
+
+  // Audience HIGH overlaps with critic HIGH; audience LOW with critic LOW
+  set('rc-aud-hi', renderCard(topN(audHi), criHiSet));
+  set('rc-cri-hi', renderCard(topN(criHi), audHiSet));
+  set('rc-aud-lo', renderCard(topN(audLo), criLoSet));
+  set('rc-cri-lo', renderCard(topN(criLo), audLoSet));
 }
 
 function renderSentiment(){

@@ -1072,9 +1072,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap nb-landing">
   <div class="kicker reveal">For the curious</div>
   <h2>The explainer <em>notebook</em></h2>
-  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis-3.ipynb</code>, which is structured per the four sections required by Project Assignment B &mdash; Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
+  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis.ipynb</code>, which is structured per the four sections required by Project Assignment B &mdash; Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
 
-  <a class="nb-big-btn reveal" id="nb-open" href="Analysis-3.ipynb" target="_blank" rel="noopener">
+  <a class="nb-big-btn reveal" id="nb-open" href="Analysis.ipynb" target="_blank" rel="noopener">
     Open the explainer notebook
     <span class="ic">&rarr;</span>
   </a>
@@ -1090,13 +1090,13 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
           <span class="ds-sub">3,781 films · TMDb + inflation-adjusted profit · ~17 MB</span>
         </span>
       </a>
-      <a class="nb-dl-btn" href="movies_full_enriched.csv" target="_blank" rel="noopener">
-        <span><b>movies_full_enriched.csv</b>
-          <span class="ds-sub">same films + Wikipedia plot &amp; critical-reception text · ~32 MB</span>
+      <a class="nb-dl-btn" href="movies_full_enriched.csv.zip" target="_blank" rel="noopener">
+        <span><b>movies_full_enriched.csv.zip</b>
+          <span class="ds-sub">same films + Wikipedia plot &amp; critical-reception text · ~13 MB (zipped)</span>
         </span>
       </a>
-      <a class="nb-dl-btn" href="Analysis-3.ipynb" target="_blank" rel="noopener">
-        <span><b>Analysis-3.ipynb</b>
+      <a class="nb-dl-btn" href="Analysis.ipynb" target="_blank" rel="noopener">
+        <span><b>Analysis.ipynb</b>
           <span class="ds-sub">the explainer notebook source · run top-to-bottom to regenerate this site</span>
         </span>
       </a>
@@ -1111,7 +1111,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <ol>
       <li><b>&sect;1 Motivation</b> &mdash; what the dataset is, why we chose it, what the end user should learn.</li>
       <li><b>&sect;2 Basic stats</b> &mdash; how the data was collected (TMDb API &sect;2.1, Wikipedia API &sect;2.2, filter + CPI inflation &sect;2.3); cleaning choices; dataset shape; network properties; log-log degree distribution; Zipf rank-frequency on the review corpus.</li>
-      <li><b>&sect;3 Tools, theory &amp; analysis</b> &mdash; community detection (greedy modularity); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index-3.html</code>.</li>
+      <li><b>&sect;3 Tools, theory &amp; analysis</b> &mdash; community detection (greedy modularity); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index.html</code>.</li>
       <li><b>&sect;4 Discussion</b> &mdash; what went well, what's still missing, ethical limits &mdash; same content as this Discussion tab.</li>
     </ol>
   </div>
@@ -1469,7 +1469,7 @@ function wireNotebookLinks(){
   // local file so the link always works for viewers running the site locally.
   const PLACEHOLDER = /Vaksth\/comsocsci2026_final_project/;
   let url = (D && D.notebook_url) || '';
-  if(!url || PLACEHOLDER.test(url)) url = 'Analysis-3.ipynb';
+  if(!url || PLACEHOLDER.test(url)) url = 'Analysis.ipynb';
   const open = document.getElementById('nb-open');
   if(open) open.href = url;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };

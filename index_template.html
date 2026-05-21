@@ -346,6 +346,14 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 .pc-card .pc-sig-list{margin:0;padding-left:18px;color:#f4f1ea;font-size:12px;line-height:1.55}
 .pc-card .pc-sig-list b{color:#46d6e0;font-weight:500}
 .pc-card .pc-year{color:#6a675f;font-size:10.5px}
+.pc-card .pc-genres{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 5px}
+.pc-card .pc-genre{font-family:'Space Mono',monospace;font-size:10px;color:#46d6e0;
+  background:rgba(70,214,224,.08);border:1px solid rgba(70,214,224,.25);
+  padding:2px 6px;border-radius:3px;letter-spacing:.04em}
+.pc-loved{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;
+  text-transform:uppercase;color:#f4b942;background:rgba(244,185,66,.1);
+  border:1px solid rgba(244,185,66,.3);padding:1px 6px;border-radius:3px;
+  margin-left:8px;vertical-align:middle}
 
 /* Option D — sentiment by cluster strip */
 .cs-block{margin-top:32px}
@@ -923,20 +931,20 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="reveal">
     <div class="tag">Audience vs Critics</div>
     <h2>How <em>audiences</em> diverge from <em>critics</em></h2>
-    <p class="body-lg">Two takes on the same films: <b>audience reviews</b> (TMDb, TF-IDF on the active track, plus VADER sentiment) vs <b>critical reception</b> (Wikipedia, TF-IDF on the active track, plus VADER sentiment). Where both sides land on the same term, it carries an overlap badge — those are the words the recipe should care about most.</p>
+    <p class="body-lg">Two takes on the same films: <b>audience reviews</b> (TMDb, scored by TF-IDF and sentiment analysis) vs <b>critical reception</b> (Wikipedia, scored by TF-IDF and sentiment analysis). Where both sides land on the same term, it carries an overlap badge; those are the words the recipe should care about most.</p>
     <span class="tbadge a aonly inl"><span class="dot"></span>Track A · adjusted profit</span>
     <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year</span>
   </div>
 
   <div class="chart-card reveal" style="margin-top:24px">
-    <h4>Sentiment by success tier — audience vs critics</h4>
-    <div class="cs">VADER compound score on audience reviews and critic reception text, averaged across the top 10% / middle 80% / bottom 10% of films under the active track. Pins above the gradient show where each tier lands on the negative→positive axis.</div>
+    <h4>Sentiment by success tier: audience vs critics</h4>
+    <div class="cs">Average sentiment score on audience reviews and critic reception text, across the top 10% / middle 80% / bottom 10% of films under the active track. Pins show where each tier lands on the negative to positive axis.</div>
     <div id="sentiment-bars" class="sent-bars"></div>
     <div class="sent-scale"><span></span><div class="axis"><span>− very negative</span><span>0 · neutral</span><span>very positive +</span></div></div>
   </div>
 
   <div class="rc-grid reveal" style="margin-top:34px">
-    <h4>What success sounds like — top 10% by current track</h4>
+    <h4>What success sounds like: top 10% by current track</h4>
     <div class="rc-row-pair">
       <div class="rc-card audience">
         <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · TF-IDF</span></div>
@@ -948,7 +956,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       </div>
     </div>
 
-    <h4 style="margin-top:32px">What failure sounds like — bottom 10% by current track</h4>
+    <h4 style="margin-top:32px">What failure sounds like: bottom 10% by current track</h4>
     <div class="rc-row-pair">
       <div class="rc-card audience">
         <div class="rc-head"><span>Audience reviews</span><span class="src">TMDb · TF-IDF</span></div>
@@ -965,7 +973,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Communities × Language</div>
   <h2>What each <em>cluster</em> is about</h2>
-  <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster by its three highest-grossing <b>signature films</b> and its most distinctive plot vocabulary. IDF is computed across the full 3,781-film corpus (not within communities) so generic words don't dominate; chi-squared collocations from notebook §3.6.5 are merged into single tokens so multi-word phrases can surface (e.g. <em>tony_stark</em>). Methodology in §3.5–3.7 of the explainer notebook.</p></div>
+  <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster by its three highest-grossing films (called <b>signature films</b>) and its most distinctive plot vocabulary. TF-IDF is computed across the full 3,781-film corpus so generic words don't dominate, and character names are filtered out so terms reflect genre and setting rather than franchise brands. Methodology in §3.5–3.7 of the explainer notebook.</p></div>
   <div class="pc-block reveal">
     <div class="pc-grid" id="pc-grid"></div>
   </div>
@@ -973,8 +981,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Sentiment by cluster</div>
-  <h2>Which clusters are <em>loved</em> &mdash; and which just <em>succeed</em>?</h2>
-  <p class="body-lg">For each of the same five clusters: mean <b>audience</b> sentiment (TMDb reviews · amber) vs mean <b>critic</b> sentiment (Wikipedia · cyan), with median per-year percentile on the right. A wide cyan bar with a narrow amber bar means critics champion films audiences don't reach for; the opposite reveals audience-driven hits.</p></div>
+  <h2>Which clusters are <em>loved</em>, and which just <em>succeed</em>?</h2>
+  <p class="body-lg">For each of the same five clusters: mean <b>audience</b> sentiment (TMDb reviews · amber) vs mean <b>critic</b> sentiment (Wikipedia · cyan), with median yearly rank on the right (how a cluster's films place within their release year). A wide cyan bar with a narrow amber bar means critics champion films audiences don't reach for; the opposite reveals audience-driven hits.</p></div>
   <div class="cs-block reveal">
     <div class="cs-grid" id="pc-sentiment-grid"></div>
   </div>
@@ -987,7 +995,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="wc-block reveal"><div class="wc-grid">
     <div class="wc hi"><div class="h"><span>High success</span><span class="pct">top 10%</span></div><img id="wc-plt-h"><div class="terms" id="t-plt-h"></div></div>
     <div class="wc lo"><div class="h"><span>Low success</span><span class="pct">bottom 10%</span></div><img id="wc-plt-l"><div class="terms" id="t-plt-l"></div></div>
-  </div><div class="takeaway">High-success plots threaten the world; low-success plots explore a life.</div></div>
+  </div><div class="takeaway">High-success plots build on large-scale stakes; low-success plots focus on personal or everyday stories.</div></div>
 </div></section>
 
 </div>
@@ -1412,11 +1420,15 @@ function renderPerCommunity(){
   grid.innerHTML = data.map(c => {
     const sig = (c.signature_films || []).map(f =>
       `<li><b>${f.title}</b><span class="pc-year"> (${f.year})</span></li>`).join('');
+    const genres = (c.top_genres || []).map(g => `<span class="pc-genre">${g}</span>`).join('');
+    const aud = c.sentiment && c.sentiment.audience_compound;
+    const lovedBadge = (aud != null && aud >= 0.7) ? '<span class="pc-loved">audience favorite</span>' : '';
     return `
     <div class="pc-card">
-      <div class="pc-label">${c.label || ('Community ' + c.community_id)}</div>
+      <div class="pc-label">${c.label || ('Community ' + c.community_id)}${lovedBadge}</div>
       <div class="pc-meta">${c.n_films} films &middot; cluster ${c.community_id}</div>
-      ${sig ? `<div class="pc-sig"><div class="pc-sig-h">Signature films</div><ol class="pc-sig-list">${sig}</ol></div>` : ''}
+      ${genres ? `<div class="pc-genres">${genres}</div>` : ''}
+      ${sig ? `<div class="pc-sig"><div class="pc-sig-h">Top-grossing films in this cluster</div><ol class="pc-sig-list">${sig}</ol></div>` : ''}
       <div class="pc-terms">${(c.terms||[]).map(t => `<span class="pc-term">${t.term}</span>`).join('')}</div>
     </div>`;
   }).join('');
@@ -1460,7 +1472,7 @@ function renderClusterSentiment(){
       </div>
       <div class="cs-pct">
         <div class="cs-pct-v">${pct}</div>
-        <div class="cs-pct-k">median per-year %ile</div>
+        <div class="cs-pct-k">median yearly rank</div>
       </div>
     </div>`;
   }).join('');

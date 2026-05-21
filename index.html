@@ -577,14 +577,14 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <div class="prog" id="prog"></div>
 <nav class="tabs" id="tabs"><div class="twrap">
   <div class="tab-group">
-    <button data-target="hero"        onclick="setActiveTab('hero')"><span class="tnum">01</span>Intro</button>
-    <button data-target="methodology" onclick="setActiveTab('methodology')"><span class="tnum">02</span>Methodology</button>
-    <button data-target="attributes"  onclick="setActiveTab('attributes')"><span class="tnum">03</span>Attributes</button>
-    <button data-target="network"     onclick="setActiveTab('network')"><span class="tnum">04</span>Network</button>
-    <button data-target="text"        onclick="setActiveTab('text')"><span class="tnum">05</span>Language</button>
-    <button data-target="recipe"      onclick="setActiveTab('recipe')"><span class="tnum">06</span>Recipe</button>
-    <button data-target="discussion"  onclick="setActiveTab('discussion')"><span class="tnum">07</span>Discussion</button>
-    <button data-target="notebook"    onclick="setActiveTab('notebook')"><span class="tnum">08</span>Notebook</button>
+    <button data-target="hero"        onclick="setActiveTab('hero')">Intro</button>
+    <button data-target="methodology" onclick="setActiveTab('methodology')">Methodology</button>
+    <button data-target="attributes"  onclick="setActiveTab('attributes')">Attributes</button>
+    <button data-target="network"     onclick="setActiveTab('network')">Network</button>
+    <button data-target="text"        onclick="setActiveTab('text')">Language</button>
+    <button data-target="recipe"      onclick="setActiveTab('recipe')">Recipe</button>
+    <button data-target="discussion"  onclick="setActiveTab('discussion')">Discussion</button>
+    <button data-target="notebook"    onclick="setActiveTab('notebook')">Notebook</button>
   </div>
   <div class="track-switch" role="tablist" aria-label="Track">
     <button id="ta" class="on" onclick="setTrack('a')">Track A · Absolute</button>
@@ -736,7 +736,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     </div>
     <div class="c3">
       <div class="n" id="s-va">+.01</div>
-      <p>Spearman ρ for critical rating <span id="s-val"></span>. Under Track A, critical rating shows a moderate positive correlation with absolute revenue — smaller than audience reach, but not negligible. Under Track B it gains weight: once films are judged within their release year, quality becomes a more reliable separator.</p>
+      <p>Spearman ρ for critical rating <span id="s-val"></span>. Under Track A, critical rating shows a moderate positive correlation with absolute revenue; smaller than audience reach, but not negligible. Under Track B it gains weight: once films are judged within their release year, quality becomes a more reliable separator.</p>
     </div>
   </div>
 
@@ -780,11 +780,11 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="net-strip-body" id="net-strip-body">
       <div class="net-strip-card">
         <div class="net-strip-track a">Track A · Absolute profit</div>
-        <p>Node size = inflation-adjusted profit ($2026). Large nodes are franchise anchors — the biggest earners across 25 years. The most connected people are rarely the biggest earners.</p>
+        <p>Node size = inflation-adjusted profit ($2026). Large nodes are franchise anchors, the biggest earners across 25 years. The most connected people are rarely the biggest earners.</p>
       </div>
       <div class="net-strip-card">
         <div class="net-strip-track b">Track B · Per-year percentile</div>
-        <p>Node size = average percentile rank within each film's release year. Removes franchise scale — rewards films that outperformed their competition, not just their era.</p>
+        <p>Node size = average percentile rank within each film's release year. Removes franchise scale and rewards films that outperformed their competition, not just their era.</p>
       </div>
       <div class="net-strip-note">Graph topology is fixed: one node per person, one edge per pair that shared a film. Only node <em>value</em> changes with the dropdown. A signal that survives both tracks is a robust signal.</div>
     </div>
@@ -799,10 +799,10 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
             <option value="value_per_year">Per-year percentile (avg per film)</option>
           </optgroup>
           <optgroup label="Centrality">
-            <option value="degree">Degree — # of collaborators</option>
-            <option value="centrality_betweenness">Betweenness — bridges between clusters</option>
-            <option value="centrality_closeness">Closeness — reach across the graph</option>
-            <option value="centrality_eigenvector">Eigenvector — dense core</option>
+            <option value="degree">Degree: number of collaborators</option>
+            <option value="centrality_betweenness">Betweenness: bridges between clusters</option>
+            <option value="centrality_closeness">Closeness: reach across the graph</option>
+            <option value="centrality_eigenvector">Eigenvector: dense core</option>
           </optgroup>
         </select>
       </label>
@@ -882,19 +882,19 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="net-track-cards reveal">
     <div class="net-track-card">
       <div class="ntc-track a">Track A · Absolute adjusted profit</div>
-      <div class="ntc-body"><b>Franchise anchors top the value ranking.</b> Downey Jr., Johansson, Evans lead — MCU scale dominates when raw dollars count. High degree (Seth Rogen, Jonah Hill) does not predict this: prolific ≠ profitable.</div>
+      <div class="ntc-body"><b>Franchise anchors top the value ranking.</b> Downey Jr., Johansson, Evans lead. MCU scale dominates when raw dollars count. High degree (Seth Rogen, Jonah Hill) does not predict this: prolific ≠ profitable.</div>
       <div class="ntc-note">Switch node size to "Degree" to see how completely the ranking changes.</div>
     </div>
     <div class="net-track-card">
       <div class="ntc-track b">Track B · Per-year percentile</div>
-      <div class="ntc-body"><b>Rankings shift toward consistent outperformers.</b> People whose typical film beats its release year rise — a harder, fairer test than raw scale. Franchise anchors still appear, but the field compresses.</div>
+      <div class="ntc-body"><b>Rankings shift toward consistent outperformers.</b> People whose typical film beats its release year rise: a harder, fairer test than raw scale. Franchise anchors still appear, but the field compresses.</div>
       <div class="ntc-note">A signal that survives both tracks is a robust signal.</div>
     </div>
   </div>
 
   <div class="null-card reveal">
     <h4>Is this network actually structured?</h4>
-    <div class="cs">A modularity of 0.73 sounds high — but high compared to what? Two null models answer this: the <b>configuration model</b> rewires every edge while keeping each person's exact collaborator count; <b>Erdős&ndash;R&eacute;nyi</b> keeps only totals. Each runs 100 times.</div>
+    <div class="cs">A modularity of 0.73 sounds high, but high compared to what? Two null models answer this: the <b>configuration model</b> rewires every edge while keeping each person's exact collaborator count; <b>Erdős&ndash;R&eacute;nyi</b> keeps only totals. Each runs 100 times.</div>
     <div class="null-score-row" id="null-score-row"></div>
     <div class="null-bar-card" id="null-bar-card"></div>
     <div class="null-read" id="null-read"></div>
@@ -906,8 +906,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   </div>
 
   <div class="cent-block reveal">
-    <h4>Who matters — by which definition?</h4>
-    <div class="cs">Three lenses on influence, each picking up a different shape. Toggle the node-size dropdown above to resize the graph by each. Key finding: <b>prolific ≠ profitable</b> — the most connected people are rarely the most valuable.</div>
+    <h4>Who matters: by which definition?</h4>
+    <div class="cs">Three lenses on influence, each picking up a different shape. Toggle the node-size dropdown above to resize the graph by each. Key finding: <b>prolific ≠ profitable</b>: the most connected people are rarely the most valuable.</div>
     <div class="cent-card-grid" id="cent-grid"></div>
   </div>
 
@@ -1002,20 +1002,20 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <div class="tab-pane" data-tab="recipe">
 <section class="recipe-sec"><div class="wrap">
   <div class="reveal"><div class="tag">Synthesis</div><h2>The recipe</h2>
-  <p class="body-lg">The recipe below is <em>not</em> everything that correlates with success. It is the smaller set of signals that remain visible after correcting for inflation <em>and</em> after checking performance within release years — the patterns that survive both fairness tests.</p></div>
+  <p class="body-lg">The recipe below is <em>not</em> everything that correlates with success. It is the smaller set of signals that remain visible after correcting for inflation <em>and</em> after checking performance within release years: the patterns that survive both fairness tests.</p></div>
   <div style="margin-top:42px">
     <div class="ing reveal"><div class="num">01</div><div><h3>A built-in audience</h3><p>Franchise/IP is the strongest signal in reviews, reception and plots under both metrics.</p></div></div>
     <div class="ing reveal"><div class="num">02</div><div><h3>Scale the stakes</h3><p>World-threatening premises beat grounded drama regardless of metric.</p></div></div>
     <div class="ing reveal"><div class="num">03</div><div><h3>Pick the right genre</h3><p>Animation, sci-fi, adventure, family top both the absolute and per-year rankings.</p></div></div>
     <div class="ing reveal"><div class="num">04</div><div><h3>Commit on budget</h3><p>Absolute: avoid the mid-budget valley. Per-year: bigger almost always ranks higher.</p></div></div>
-    <div class="ing reveal"><div class="num">05</div><div><h3>Earn the conversation</h3><p>Vote count leads both — but per-year, critical rating finally matters too.</p></div></div>
+    <div class="ing reveal"><div class="num">05</div><div><h3>Earn the conversation</h3><p>Vote count leads both; per-year, critical rating finally matters too.</p></div></div>
   </div>
 </div></section>
 
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Caveats</div><h2>What this <em>cannot</em> claim</h2></div>
   <div class="lims">
-    <div class="lim reveal"><h3>Metric agreement</h3><p>The two tracks correlate <span id="cv-track-rho">ρ≈0.98</span>, so findings are robust &mdash; but the per-year R² (<span id="cv-r2-b">38%</span>) shows success is harder to predict fairly than the absolute view (<span id="cv-r2-a">59%</span>) suggests.</p></div>
+    <div class="lim reveal"><h3>Metric agreement</h3><p>The two tracks correlate <span id="cv-track-rho">ρ≈0.98</span>, so findings are robust, but the per-year R² (<span id="cv-r2-b">38%</span>) shows success is harder to predict fairly than the absolute view (<span id="cv-r2-a">59%</span>) suggests.</p></div>
     <div class="lim reveal"><h3>Associations, not causes</h3><p>Every signal here is correlational. Survivorship bias, US/TMDb skew, and the distinction between correlation and causation are covered in the <a href="#discussion" onclick="setActiveTab('discussion');return false;" style="color:#46d6e0">Discussion tab</a>.</p></div>
   </div>
 </div></section>
@@ -1023,9 +1023,9 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section class="concl"><div class="wrap reveal">
   <div class="tag" style="justify-content:center">Conclusion</div>
   <h2>The strongest recipe isn&rsquo;t <em>"make a big film."</em></h2>
-  <p>It&rsquo;s <b>make a film whose scale, genre, collaboration network, and language still look successful after time is made fair</b> — both within its year and against 25&nbsp;years of inflation-adjusted history.</p>
+  <p>It&rsquo;s <b>make a film whose scale, genre, collaboration network, and language still look successful after time is made fair</b>, both within its year and against 25&nbsp;years of inflation-adjusted history.</p>
   <p>IP-backed, world-scale, animation / sci-fi / adventure, budgeted to avoid the trap, built to be talked about.</p>
-  <p class="k">When success is judged fairly within each year, critical quality re-enters the recipe — the only thing the inflation-blind view had hidden.</p>
+  <p class="k">When success is judged fairly within each year, critical quality re-enters the recipe: the only thing the inflation-blind view had hidden.</p>
 </div></section>
 
 </div>
@@ -1033,35 +1033,35 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <div class="tab-pane" data-tab="discussion">
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Discussion</div>
-  <h2>What we can &mdash; and <em>cannot</em> &mdash; claim</h2>
+  <h2>What we can and cannot claim</h2>
   <p class="body-lg">A great project is honest about its limits. This page lists what the analysis supports, what was deliberately left out, and the ethical caveats every reader should keep in mind. The same list appears in §4 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</p></div>
 
   <div class="disc-grid">
     <div class="disc-card reveal">
       <h4>What went well</h4>
       <ul>
-        <li><b>Two-track methodology pays off</b> &mdash; rankings shift visibly between Track A and Track B, validating the inflation-fairness argument.</li>
-        <li><b>The network has real structure</b> &mdash; observed modularity 0.73 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
-        <li><b>Successful people cluster</b> &mdash; Newman attribute assortativity sharply positive and far outside the label-shuffle null under both tracks.</li>
-        <li><b>Per-community vocabulary is interpretable</b> &mdash; corpus-wide IDF + bigrams surface coherent cluster vocabularies (MCU, Fast &amp; Furious, X-Men/LOTR), the network &times; text integration the rubric asks for.</li>
+        <li><b>Two-track methodology pays off:</b> rankings shift visibly between Track A and Track B, validating the inflation-fairness argument.</li>
+        <li><b>The network has real structure:</b> observed modularity 0.73 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
+        <li><b>Successful people cluster:</b> Newman attribute assortativity sharply positive and far outside the label-shuffle null under both tracks.</li>
+        <li><b>Per-community vocabulary is interpretable:</b> corpus-wide IDF + bigrams surface coherent cluster vocabularies (MCU, Fast &amp; Furious, X-Men/LOTR), the network &times; text integration the rubric asks for.</li>
       </ul>
     </div>
 
     <div class="disc-card reveal">
       <h4>What could be improved</h4>
       <ul>
-        <li><b>Bigger collocation vocabulary</b> &mdash; chi-squared collocations with <code>MWETokenizer</code> are applied to the plot corpus (notebook §3.6.5). Extending the same pass to the review and critic corpora, and capturing trigrams, would widen coverage.</li>
-        <li><b>Gender / diversity attributes</b> &mdash; names are baked in via <code>top_cast</code> but not modelled. A gender-labelled audit would let us study disassortativity by gender.</li>
-        <li><b>Sequel / franchise flag</b> &mdash; isolating first-of-franchise vs sequel films would refine the "IP backed" finding.</li>
-        <li><b>Foreign-language films</b> &mdash; the dataset is US-theatrical only.</li>
-        <li><b>Weighted assortativity</b> &mdash; our Newman implementation treats every edge equally even though edges carry a <code>weight</code>.</li>
+        <li><b>Bigger collocation vocabulary:</b> chi-squared collocations with <code>MWETokenizer</code> are applied to the plot corpus (notebook §3.6.5). Extending the same pass to the review and critic corpora, and capturing trigrams, would widen coverage.</li>
+        <li><b>Gender / diversity attributes:</b> names are baked in via <code>top_cast</code> but not modelled. A gender-labelled audit would let us study disassortativity by gender.</li>
+        <li><b>Sequel / franchise flag:</b> isolating first-of-franchise vs sequel films would refine the "IP backed" finding.</li>
+        <li><b>Foreign-language films:</b> the dataset is US-theatrical only.</li>
+        <li><b>Weighted assortativity:</b> our Newman implementation treats every edge equally even though edges carry a <code>weight</code>.</li>
       </ul>
     </div>
 
     <div class="disc-card ethics reveal">
       <h4>Ethics &amp; limitations</h4>
       <ul>
-        <li><b>"High-grossing" &ne; "good".</b> A film crossing our top-10% threshold sold tickets &mdash; possibly bought at scale by the studio's own marketing. This is a marketing recipe, not a film-school one.</li>
+        <li><b>"High-grossing" &ne; "good".</b> A film crossing our top-10% threshold sold tickets, possibly bought at scale by the studio's own marketing. This is a marketing recipe, not a film-school one.</li>
         <li><b>Survivorship bias.</b> Failed projects, shelved films, and direct-to-video releases are invisible. Every success factor is computed inside the surviving population.</li>
         <li><b>US / TMDb / Wikipedia biases.</b> TMDb skews to English-language Hollywood; Wikipedia plot and critic sections cover notable titles preferentially. Smaller films are under-represented in the text analysis.</li>
         <li><b>Cast attribution.</b> <code>top_cast</code> weighs star power over below-the-line workers. The collaboration network is a <em>visible-credit</em> network, not a complete crew network.</li>
@@ -1078,7 +1078,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap nb-landing">
   <div class="kicker reveal">For the curious</div>
   <h2>The explainer <em>notebook</em></h2>
-  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis.ipynb</code>, which is structured per the four sections required by Project Assignment B &mdash; Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
+  <p class="body-lg">The website tells the story; the notebook shows the work. Every number, chart, and panel on this site is computed inside <code>Analysis.ipynb</code>, which is structured per the four sections required by Project Assignment B: Motivation, Basic stats, Tools/theory/analysis, Discussion. It also includes the two extraction pipelines (TMDb + Wikipedia) that produced the underlying CSVs.</p>
 
   <a class="nb-big-btn reveal" id="nb-open" href="Analysis.ipynb" target="_blank" rel="noopener">
     Open the explainer notebook
@@ -1115,10 +1115,10 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="nb-guide reveal">
     <h4>How the notebook is organised</h4>
     <ol>
-      <li><b>&sect;1 Motivation</b> &mdash; what the dataset is, why we chose it, what the end user should learn.</li>
-      <li><b>&sect;2 Basic stats</b> &mdash; how the data was collected (TMDb API &sect;2.1, Wikipedia API &sect;2.2, filter + CPI inflation &sect;2.3); cleaning choices; dataset shape; network properties; log-log degree distribution; Zipf rank-frequency on the review corpus.</li>
-      <li><b>&sect;3 Tools, theory &amp; analysis</b> &mdash; community detection (greedy modularity); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index.html</code>.</li>
-      <li><b>&sect;4 Discussion</b> &mdash; what went well, what's still missing, ethical limits &mdash; same content as this Discussion tab.</li>
+      <li><b>§1 Motivation:</b> what the dataset is, why we chose it, what the end user should learn.</li>
+      <li><b>§2 Basic stats:</b> how the data was collected (TMDb API &sect;2.1, Wikipedia API &sect;2.2, filter + CPI inflation &sect;2.3); cleaning choices; dataset shape; network properties; log-log degree distribution; Zipf rank-frequency on the review corpus.</li>
+      <li><b>§3 Tools, theory &amp; analysis:</b> community detection (greedy modularity); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index.html</code>.</li>
+      <li><b>&§4 Discussion:</b> what went well, what's still missing, ethical limits. Same content as this Discussion tab.</li>
     </ol>
   </div>
 </div></section>

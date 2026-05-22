@@ -882,7 +882,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="net-track-cards reveal">
     <div class="net-track-card">
       <div class="ntc-track a">Track A · Absolute adjusted profit</div>
-      <div class="ntc-body"><b>Franchise anchors top the value ranking.</b> Downey Jr., Johansson, Evans lead. MCU scale dominates when raw dollars count. High degree (Seth Rogen, Jonah Hill) does not predict this: prolific ≠ profitable.</div>
+      <div class="ntc-body"><b>Franchise anchors top the value ranking.</b> Downey Jr., Johansson, Evans lead. Marvel Universe scale dominates when raw dollars count. High degree (Seth Rogen, Jonah Hill) does not predict this: prolific ≠ profitable.</div>
       <div class="ntc-note">Switch node size to "Degree" to see how completely the ranking changes.</div>
     </div>
     <div class="net-track-card">
@@ -922,6 +922,15 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   </div>
   <div class="net-table-toggle reveal">
     <button id="netExpandBtn" onclick="toggleNetTable()">Show more ▾</button>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="reveal">
+    <div class="tag">Network Findings</div>
+    <h2>What the network tells us about <em>success</em></h2>
+    <p class="body-lg">Recurring collaborations are not random. The five communities identified by the Louvain algorithm each correspond to a recognisable franchise ecosystem: the Marvel Universe cluster dominates raw profit while the Animated Comedy and Family Adventure clusters consistently outperform their release-year peers. This answers the second research question directly: <b>cast and director collaborations that recur in high-grossing films cluster tightly around franchise IP</b>, and that clustering is statistically real, not a quirk of degree distribution (modularity 0.73 vs null ~0.40).</p>
+    <p class="body-lg">The centrality analysis adds a sharper finding: <b>the most connected people are rarely the most valuable</b>. Prolific collaborators (high degree) and financially successful ones are almost entirely separate populations under both tracks. Under Track B, consistent per-year outperformers rise to the top, suggesting that franchise anchoring matters more than sheer connectivity.</p>
   </div>
 </div></section>
 
@@ -998,6 +1007,15 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   </div><div class="takeaway">High-success plots build on large-scale stakes; low-success plots focus on personal or everyday stories.</div></div>
 </div></section>
 
+<section><div class="wrap">
+  <div class="reveal">
+    <div class="tag">Language Findings</div>
+    <h2>What the language tells us about <em>success</em></h2>
+    <p class="body-lg">Both the plot and review corpora point in the same direction. <b>Successful films use world-scale language</b> (attack, destroy, earth, save, escape) while unsuccessful films stay personal and local (life, coach, pay, struggle). This holds under both Track A and Track B, making it one of the most consistent signals across the whole project.</p>
+    <p class="body-lg">On the audience side, sentiment is higher for successful films across all clusters, but the gap between audience and critic reception varies. <b>The Marvel Universe and Animated Comedy clusters score highest with audiences</b>, while critical reception is more evenly spread. Review language confirms the plot finding: successful reviews celebrate scale and spectacle; unsuccessful ones describe intimate or unresolved storylines. Taken together, the language lens answers the third and fourth research questions: shared plot language and review tone both track success, and they reinforce rather than contradict the attribute and network findings.</p>
+  </div>
+</div></section>
+
 </div>
 <div class="tab-pane" data-tab="recipe">
 <section class="recipe-sec"><div class="wrap">
@@ -1043,7 +1061,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
         <li><b>Two-track methodology pays off:</b> rankings shift visibly between Track A and Track B, validating the inflation-fairness argument.</li>
         <li><b>The network has real structure:</b> observed modularity 0.73 vs configuration null ~0.40, clustering 0.36 vs ~0.007. The communities are not artefacts of degree distribution.</li>
         <li><b>Successful people cluster:</b> Newman attribute assortativity sharply positive and far outside the label-shuffle null under both tracks.</li>
-        <li><b>Per-community vocabulary is interpretable:</b> corpus-wide IDF + bigrams surface coherent cluster vocabularies (MCU, Fast &amp; Furious, X-Men/LOTR), the network &times; text integration the rubric asks for.</li>
+        <li><b>Per-community vocabulary is interpretable:</b> corpus-wide IDF + bigrams surface coherent cluster vocabularies (Marvel Universe, Action Comedy, Sci-Fi Epic), the network &times; text integration the rubric asks for.</li>
       </ul>
     </div>
 

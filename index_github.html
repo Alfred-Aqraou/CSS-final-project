@@ -723,7 +723,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <span class="tbadge a aonly inl"><span class="dot"></span>Track A · inflation-adjusted profit</span>
   <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year percentile</span>
   <p class="body-lg" style="margin-top:14px">With two fair definitions of success in hand, the first concrete question is the simplest: which film-level attributes actually correlate with each? We rank four numeric features (audience vote count, inflation-adjusted budget, critical rating and runtime) by Spearman ρ against the active track's success metric, then re-cut the data by genre and by budget tier. The three numbers below summarise how much of success these attributes capture, and where the picture changes between Track A and Track B.</p>
-  <p class="body-lg" style="margin-top:10px"><span class="aonly inl">Under absolute profit, raw popularity dominates and a four-feature linear model explains <b>59%</b> of the variance, though this track is inflated by time and part of that fit reflects chart-topping recent franchises.</span><span class="bonly inl">Judged per-year, popularity weakens and <b>critical rating jumps in importance</b>. The four-feature model now explains <b>38%</b>: a harder, fairer target that better separates films from their year, not from history.</span></p></div>
+  <p class="body-lg" style="margin-top:10px"><span class="aonly inl">Under absolute profit, raw popularity dominates and a four-feature linear model explains <b>59%</b> of the variance, though this track is inflated by time and part of that fit reflects chart-topping recent franchises.</span><span class="bonly inl">Judged per-year, popularity weakens and <b>critical rating gains in relative weight</b>. The four-feature model now explains <b>38%</b>: a harder, fairer target that better separates films from their year, not from history.</span></p></div>
 
   <div class="stats reveal">
     <div class="c1">
@@ -786,7 +786,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
         <div class="net-strip-track b">Track B · Per-year percentile</div>
         <p>Node size = average percentile rank within each film's release year. Removes franchise scale and rewards films that outperformed their competition, not just their era.</p>
       </div>
-      <div class="net-strip-note">Graph topology is fixed: one node per person, one edge per pair that shared a film. Only node <em>value</em> changes with the dropdown. A signal that survives both tracks is a robust signal.</div>
+      <div class="net-strip-note">Node positions and community colours are fixed: one node per person, one edge per pair that co-appeared in ≥ 2 films (adjustable above). Only node <em>value</em> changes with the dropdown. A signal that survives both tracks is a robust signal.</div>
     </div>
   </div></div>
   <div class="network-panel reveal">
@@ -1136,7 +1136,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
       <li><b>§1 Motivation:</b> what the dataset is, why we chose it, what the end user should learn.</li>
       <li><b>§2 Basic stats:</b> how the data was collected (TMDb API &sect;2.1, Wikipedia API &sect;2.2, filter + CPI inflation &sect;2.3); cleaning choices; dataset shape; network properties; log-log degree distribution; Zipf rank-frequency on the review corpus.</li>
       <li><b>§3 Tools, theory &amp; analysis:</b> community detection (greedy modularity); null-model tests (configuration + ER); Newman degree assortativity correctly bidirectional; track-aware attribute assortativity with label-shuffle null; corpus-wide TF-IDF with bigrams; per-community vocabulary; VADER sentiment; time-fairness series. The last cell rebuilds <code>index.html</code>.</li>
-      <li><b>&§4 Discussion:</b> what went well, what's still missing, ethical limits. Same content as this Discussion tab.</li>
+      <li><b>§4 Discussion:</b> what went well, what's still missing, ethical limits. Same content as this Discussion tab.</li>
     </ol>
   </div>
 </div></section>

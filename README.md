@@ -29,7 +29,7 @@ Signals that hold under both tracks are treated as robust; signals present only 
 | `movies_full_enriched.csv.zip` | Same films + Wikipedia plot and critical-reception text. |
 | `Data_Extraction.ipynb` | Original TMDb extraction pipeline (provenance only). |
 | `wiki.ipynb` | Original Wikipedia scraping pipeline (provenance only). |
-| `fig_*.png` | Figure exports for nbviewer rendering. |
+| `wc_plot_*.png` | Word-cloud exports (four variants: Track A/B × high/low performers) for nbviewer rendering. |
 
 ---
 
@@ -55,5 +55,5 @@ Organised per Project Assignment B requirements:
 
 - **§1 Motivation** — dataset description, research questions, user experience goals
 - **§2 Basic stats** — acquisition, cleaning, inflation adjustment, network and text descriptive statistics
-- **§3 Tools, theory & analysis** — community detection, null-model tests, degree and attribute assortativity, corpus-wide TF-IDF with collocations, VADER sentiment, time-fairness series, attribute correlations
+- **§3 Tools, theory & analysis** — community detection, centrality (degree/betweenness/closeness), null-model permutation tests, degree and attribute assortativity, per-community plot vocabulary (network × text), corpus-wide TF-IDF with bigrams and chi-squared collocations, group-vs-rest TF-IDF, VADER sentiment (audience and critic), time-fairness series, Spearman correlations, R² regressions, genre ranking, budget-tier breakdown
 - **§4 Discussion** — what worked, limitations, ethical caveats

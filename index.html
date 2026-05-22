@@ -582,8 +582,8 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <button data-target="attributes"  onclick="setActiveTab('attributes')"><span class="tnum">03</span>Attributes</button>
     <button data-target="network"     onclick="setActiveTab('network')"><span class="tnum">04</span>Network</button>
     <button data-target="text"        onclick="setActiveTab('text')"><span class="tnum">05</span>Language</button>
-    <button data-target="recipe"      onclick="setActiveTab('recipe')"><span class="tnum">06</span>Recipe</button>
-    <button data-target="discussion"  onclick="setActiveTab('discussion')"><span class="tnum">07</span>Discussion</button>
+    <button data-target="discussion"  onclick="setActiveTab('discussion')"><span class="tnum">06</span>Discussion</button>
+    <button data-target="recipe"      onclick="setActiveTab('recipe')"><span class="tnum">07</span>Recipe</button>
     <button data-target="notebook"    onclick="setActiveTab('notebook')"><span class="tnum">08</span>Notebook</button>
   </div>
   <div class="track-switch" role="tablist" aria-label="Track">
@@ -1018,6 +1018,12 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div></section>
 
 </div>
+<div class="tab-pane" data-tab="discussion">
+<section><div class="wrap">
+  <div class="reveal"><div class="tag">Discussion</div>
+  <h2>What we can and cannot claim</h2>
+  <p class="body-lg">A great project is honest about its limits. This page lists what the analysis supports, what was deliberately left out, and the ethical caveats every reader should keep in mind. The same list appears in §4 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</p></div>
+
 <div class="tab-pane" data-tab="recipe">
 <section class="recipe-sec"><div class="wrap">
   <div class="reveal"><div class="tag">Synthesis</div><h2>The recipe</h2>
@@ -1035,7 +1041,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="reveal"><div class="tag">Caveats</div><h2>What this <em>cannot</em> claim</h2></div>
   <div class="lims">
     <div class="lim reveal"><h3>Metric agreement</h3><p>The two tracks correlate <span id="cv-track-rho">ρ≈0.98</span>, so findings are robust, but the per-year R² (<span id="cv-r2-b">38%</span>) shows success is harder to predict fairly than the absolute view (<span id="cv-r2-a">59%</span>) suggests.</p></div>
-    <div class="lim reveal"><h3>Associations, not causes</h3><p>Every signal here is correlational. Survivorship bias, US/TMDb skew, and the distinction between correlation and causation are covered in the <a href="#discussion" onclick="setActiveTab('discussion');return false;" style="color:#46d6e0">Discussion tab</a>.</p></div>
+    <div class="lim reveal"><h3>Associations, not causes</h3><p>Every signal here is correlational. Survivorship bias, US/TMDb skew, and the distinction between correlation and causation are covered in the <a href="#discussion" onclick="setActiveTab('discussion');return false;" style="color:#46d6e0">Discussion tab</a> above.</p></div>
   </div>
 </div></section>
 
@@ -1048,12 +1054,6 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 </div></section>
 
 </div>
-
-<div class="tab-pane" data-tab="discussion">
-<section><div class="wrap">
-  <div class="reveal"><div class="tag">Discussion</div>
-  <h2>What we can and cannot claim</h2>
-  <p class="body-lg">A great project is honest about its limits. This page lists what the analysis supports, what was deliberately left out, and the ethical caveats every reader should keep in mind. The same list appears in §4 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</p></div>
 
   <div class="disc-grid">
     <div class="disc-card reveal">

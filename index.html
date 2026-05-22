@@ -1554,24 +1554,48 @@ function _normTerms(arr){
     : { term: it.term || '', score: (it.score == null ? null : +it.score) });
 }
 
+const RC_STOP = new Set([
+  'stars','half','half stars','three','three stars','four','four stars','two',
+  'five','five stars','one','writing','stating','stated','three half',
+  'archive','url','https','http','date','access date','access','com','org',
+  'st century','ii','iii',
+  'states','consensus','consensus states','critics consensus','site consensus',
+  'metacritic','metacritic score','metacritic based','score based',
+  'based critics','based average','critics based','average critics','average metacritic',
+  'indicating','indicating generally','generally','received','received negative','received mixed',
+  'negative critics','grossed','million','office','box office',
+  'polled','posttrak','polled posttrak','posttrak positive','scale polled',
+  'aggregator','aggregator approval','approval','approval based','critics indicating',
+  'review aggregator','average score','scale',
+  'journal','weekly','chicago','entertainment weekly','berardinelli','type',
+  'also','called','first','second','third','fourth','out','out four','out five',
+  'panned critics',
+]);
+
 function renderReviewsCriticsCompare(){
-  // Side-by-side bar chart of TF-IDF terms: audience vs critic, for high and
-  // low success on the currently active track. Overlap terms get a badge on
-  // the OPPOSITE card (audience badge on critic card and vice versa).
   const tk = (TRACK == 'a') ? 'A_whole_period' : 'B_per_year';
   const dyn = (D && D.tfidf_terms) || {};
   const aud = dyn.reviews?.[tk]   || TERMS.reviews[tk];
   const cri = dyn.critical?.[tk]  || TERMS.critical[tk];
-  const audHi = _normTerms(aud.hi);
-  const audLo = _normTerms(aud.lo);
-  const criHi = _normTerms(cri.hi);
-  const criLo = _normTerms(cri.lo);
 
   const lc = s => (s || '').toLowerCase();
-  const audHiSet = new Set(audHi.map(x => lc(x.term)));
-  const audLoSet = new Set(audLo.map(x => lc(x.term)));
-  const criHiSet = new Set(criHi.map(x => lc(x.term)));
-  const criLoSet = new Set(criLo.map(x => lc(x.term)));
+  const topN = (arr, n=10) => arr.slice(0, n);
+  const filterRC = arr => arr.filter(x => !RC_STOP.has(lc(x.term || '')));
+
+  const audHi = filterRC(_normTerms(aud.hi));
+  const audLo = filterRC(_normTerms(aud.lo));
+  const criHi = filterRC(_normTerms(cri.hi));
+  const criLo = filterRC(_normTerms(cri.lo));
+
+  const audHiTop = topN(audHi);
+  const audLoTop = topN(audLo);
+  const criHiTop = topN(criHi);
+  const criLoTop = topN(criLo);
+
+  const audHiSet = new Set(audHiTop.map(x => lc(x.term)));
+  const audLoSet = new Set(audLoTop.map(x => lc(x.term)));
+  const criHiSet = new Set(criHiTop.map(x => lc(x.term)));
+  const criLoSet = new Set(criLoTop.map(x => lc(x.term)));
 
   const renderCard = (items, oppositeSet) => {
     if(!items.length) return '<div class="cs">No terms.</div>';
@@ -1597,15 +1621,11 @@ function renderReviewsCriticsCompare(){
   };
 
   const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
-  // Audience HIGH overlaps with critic HIGH; audience LOW with critic LOW
-  // limit to top 10
-  const topN = (arr, n=10) => arr.slice(0, n);
 
-  // Audience HIGH overlaps with critic HIGH; audience LOW with critic LOW
-  set('rc-aud-hi', renderCard(topN(audHi), criHiSet));
-  set('rc-cri-hi', renderCard(topN(criHi), audHiSet));
-  set('rc-aud-lo', renderCard(topN(audLo), criLoSet));
-  set('rc-cri-lo', renderCard(topN(criLo), audLoSet));
+  set('rc-aud-hi', renderCard(audHiTop, criHiSet));
+  set('rc-cri-hi', renderCard(criHiTop, audHiSet));
+  set('rc-aud-lo', renderCard(audLoTop, criLoSet));
+  set('rc-cri-lo', renderCard(criLoTop, audLoSet));
 }
 
 function renderSentiment(){

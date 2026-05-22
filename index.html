@@ -596,7 +596,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <header class="hero"><div class="wrap">
   <div class="kicker reveal">02467 Computational Social Science · Project Assignment B</div>
   <h1 class="reveal">Recipe for<br><em>high-grossing</em><br>movies</h1>
-  <p class="lede reveal">Across 25 years and 3,781 US films, what separates the top 10% from the rest? Not just money — a 2001 dollar and a 2024 dollar measure very different film markets. This project builds two fair definitions of success, then tests four independent lenses — <b>attributes</b>, <b>network</b>, <b>plots</b>, <b>reviews</b> — to find the patterns that hold up under <b>both</b>.</p>
+  <p class="lede reveal">Box-office success is hard to compare across decades: a 2001 release lives in a different market than a 2024 release. This project first builds a fair, year-aware measure of success, then tests 3,781 US theatrical films across four lenses (<b>attributes</b>, <b>network</b>, <b>plots</b>, <b>reviews</b>) to find the patterns that hold up under <b>both definitions of success</b>.</p>
   <div class="meta reveal">
     <span><b>3,781</b>US films · 2000–present</span>
     <span><b>2 metrics</b>absolute & per-year</span>
@@ -627,7 +627,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="cs">3,781 US theatrical films released between 2000 and 2026. The data combines two sources we built ourselves: a TMDb extraction (revenue, budget, cast, directors, votes, audience reviews) with an inflation-corrected profit column in 2026 dollars, joined on <code>tmdb_id</code> with Wikipedia plot summaries and critical-reception sections. The full pipeline is documented in §2 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</div>
 
     <div class="ds-sub-h"><span class="num">a · Shape</span><h4>At a glance</h4></div>
-    <p class="ds-sub-lede">These counts are for the base dataset, before network and text analysis. Coverage gaps in the Wikipedia columns are why the Language tab works with a sub-sample.</p>
+    <p class="ds-sub-lede">These are the raw film counts, before any network construction or text analysis. Coverage gaps in the Wikipedia columns are why the Language tab works with a sub-sample.</p>
     <div class="ds-grid">
       <div class="ds-stat"><div class="ds-k">Films</div><div class="ds-v" id="ds-films">3,781</div><div class="ds-sub">US theatrical · ≥ $1 M revenue · budget present</div></div>
       <div class="ds-stat"><div class="ds-k">Years</div><div class="ds-v" id="ds-years">2000–2026</div><div class="ds-sub">27 years · 2026 partial (extraction date May)</div></div>
@@ -736,7 +736,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     </div>
     <div class="c3">
       <div class="n" id="s-va">+.01</div>
-      <p>Spearman ρ for critical rating <span id="s-val"></span>. Weaker than vote count but stable across both tracks. Under absolute profit, audience reach dominates; switch to per-year and critical quality becomes a more reliable separator.</p>
+      <p>Spearman ρ for critical rating <span id="s-val"></span>. Lower than vote count, but consistent across both tracks. Under absolute profit, audience reach dominates; under per-year, critical quality becomes a more reliable separator.</p>
     </div>
   </div>
 
@@ -746,14 +746,14 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
     <div class="cs">Spearman ρ between each numeric feature and the active success metric (<span id="corr-track">Track A · inflation-adjusted profit</span>). Range −1 (perfect inverse) to +1 (perfect agreement); zero = no monotonic relationship.</div>
     <div class="bars" id="corrbars"></div>
   </div>
-  <p class="body-lg reveal" style="margin-top:28px">Budget and runtime also correlate positively but trail far behind under both tracks.</p>
+  <p class="body-lg reveal" style="margin-top:28px">The ranking shifts when you switch tracks. Under absolute profit, audience reach dominates because blockbusters that open wide accumulate revenue regardless of when they were released. Under per-year percentile, critical rating gains ground: once a film is judged only against its own year, quality becomes a more reliable separator. Budget and runtime remain secondary under both definitions.</p>
 </div></section>
 
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Budget</div>
   <h2>Two strategies, one <em>valley</em></h2>
   <p class="body-lg">Films are sorted into five equal-population budget tiers (inflation-adjusted), each holding roughly 750 titles, from cheapest (Q1) to priciest (Q5). The three panels below report the median outcome inside each tier under the active track.</p>
-  <p class="body-lg aonly">Under absolute profit, the ROI curve is U-shaped: cheap films return most per dollar (low denominators flatter the ratio), mega-budgets are the safest absolute earners, and the middle bleeds. Mid-range films need a real audience but lack the marketing scale to dominate their opening weekend.</p>
+  <p class="body-lg aonly">Under absolute profit, the ROI curve is U-shaped: cheap films return most per dollar (low denominators flatter the ratio), mega-budgets are the safest absolute earners, and the middle bleeds. Mid-range films need a real audience but are not big enough to force one through marketing spend.</p>
   <p class="body-lg bonly">Per-year, the curve is near-monotonic: bigger budgets buy higher relative rank almost linearly. Inside a single release year, scale is the surest way to beat your cohort. The mid-budget valley flattens out once we stop comparing across decades.</p></div>
   <div class="trio" id="budgettrio"></div>
 </div></section>
@@ -940,7 +940,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
   <div class="reveal">
     <div class="tag">Audience vs Critics</div>
     <h2>How <em>audiences</em> diverge from <em>critics</em></h2>
-    <p class="body-lg">Attributes and networks measure how films perform. Language shows how people talk about them. This tab scores two text corpora — <b>audience reviews</b> (TMDb) and <b>critical reception</b> (Wikipedia) — with TF-IDF and VADER sentiment against the active success track. Terms that appear in both carry an overlap badge: they're the most robust vocabulary signals, independent of which source you trust.</p>
+    <p class="body-lg">Two takes on the same films: <b>audience reviews</b> (TMDb, scored by TF-IDF and sentiment analysis) vs <b>critical reception</b> (Wikipedia, scored by TF-IDF and sentiment analysis). Where both sides land on the same term, it carries an overlap badge; those are the words the recipe should care about most.</p>
     <span class="tbadge a aonly inl"><span class="dot"></span>Track A · adjusted profit</span>
     <span class="tbadge b bonly inl"><span class="dot"></span>Track B · per-year</span>
   </div>
@@ -982,7 +982,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Communities × Language</div>
   <h2>What each <em>cluster</em> is about</h2>
-  <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster by its three highest-grossing films (called <b>signature films</b>) and its most distinctive plot vocabulary. TF-IDF is computed across the full 3,781-film corpus so generic words don't dominate, and character names are filtered out so terms reflect genre and setting rather than franchise brands.</p></div>
+  <p class="body-lg">The collaboration network groups people who repeatedly work together. Each card below identifies a cluster by its three highest-grossing films (called <b>signature films</b>) and its most distinctive plot vocabulary. TF-IDF is computed across the full 3,781-film corpus so generic words don't dominate, and character names are filtered out so terms reflect genre and setting rather than franchise brands. Methodology in §3.5–3.7 of the explainer notebook.</p></div>
   <div class="pc-block reveal">
     <div class="pc-grid" id="pc-grid"></div>
   </div>
@@ -991,7 +991,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Sentiment by cluster</div>
   <h2>Which clusters are <em>loved</em>, and which just <em>succeed</em>?</h2>
-  <p class="body-lg">For each cluster: mean <b>audience</b> sentiment (TMDb reviews · amber) vs mean <b>critic</b> sentiment (Wikipedia · cyan), with median yearly rank on the right. The gap between the bars shows whether a cluster earns its position with audiences, with critics, or with both — and reveals which film ecosystems are market-driven versus prestige-driven.</p></div>
+  <p class="body-lg">For each of the same five clusters: mean <b>audience</b> sentiment (TMDb reviews · amber) vs mean <b>critic</b> sentiment (Wikipedia · cyan), with median yearly rank on the right (how a cluster's films place within their release year). A wide cyan bar with a narrow amber bar means critics champion films audiences don't reach for; the opposite reveals audience-driven hits.</p></div>
   <div class="cs-block reveal">
     <div class="cs-grid" id="pc-sentiment-grid"></div>
   </div>
@@ -1000,7 +1000,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Plot Themes</div>
   <h2>The <em>plot themes</em> of successes and failures</h2>
-  <p class="body-lg">Successful films don't just differ in budget or collaborators — they differ in what they're <em>about</em>. These word clouds distil the most distinctive vocabulary from Wikipedia plot summaries: character names filtered out, compound phrases merged, so what remains reflects genre and narrative tone rather than franchise labels. The top 10% and bottom 10% cluster around strikingly different worlds.</p></div>
+  <p class="body-lg">Wikipedia plot summaries, TF-IDF by the active track. The cleaning step strips wiki / HTML markup and applies a name-stop extension (cast names, NLTK names corpus, spaCy NER) so character names are filtered from the vocabulary. Multi-word collocations are merged via chi-squared selection and <code>MWETokenizer</code> (§3.6.5) so compound phrases surface as single tokens. What remains reflects narrative genre and plot structure rather than franchise brand names.</p></div>
   <div class="wc-block reveal"><div class="wc-grid">
     <div class="wc hi"><div class="h"><span>High success</span><span class="pct">top 10%</span></div><img id="wc-plt-h"><div class="terms" id="t-plt-h"></div></div>
     <div class="wc lo"><div class="h"><span>Low success</span><span class="pct">bottom 10%</span></div><img id="wc-plt-l"><div class="terms" id="t-plt-l"></div></div>
@@ -1052,7 +1052,7 @@ footer{border-top:1px solid var(--line);padding:46px 0;text-align:center;font-fa
 <section><div class="wrap">
   <div class="reveal"><div class="tag">Discussion</div>
   <h2>What we can and cannot claim</h2>
-  <p class="body-lg">Every finding on this site has limits. This page is honest about what the analysis supports, what it cannot claim, and what every reader should keep in mind. The same points appear in §4 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</p></div>
+  <p class="body-lg">A great project is honest about its limits. This page lists what the analysis supports, what was deliberately left out, and the ethical caveats every reader should keep in mind. The same list appears in §4 of the <a href="#notebook" onclick="setActiveTab('notebook');return false;" style="color:#46d6e0">explainer notebook</a>.</p></div>
 
   <div class="disc-grid">
     <div class="disc-card reveal">
